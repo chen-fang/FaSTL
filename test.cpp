@@ -1,6 +1,6 @@
 #include "vector_unbounded.hpp"
-//#include "ADscalar.hpp"
-//#include "ADvector.hpp"
+#include "ADscalar.hpp"
+#include "ADvector.hpp"
 #include <iostream>
 
 class A
@@ -33,11 +33,12 @@ private:
 
 int main()
 {
-   typedef fastl::coherent_fast<> ALLOC;
+   typedef fastl::coherent_safe<> ALLOC;
    ALLOC allocator( 100 * sizeof(double) );
 
-   fastl::vector_unbounded< double, ALLOC > a( 4, allocator );
-   a.print();
+   ADvector<> a( 4, allocator, 4 );
+   //a.print();
+   std::cout << a[1].get_value() << std::endl;
 
    return -1;
 }

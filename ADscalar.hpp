@@ -2,16 +2,18 @@
 
 #include "vector_unbounded.hpp"
 
-tempalte< typename __Alloc = fastl::coherent_safe<> >
+template< typename __Alloc = fastl::coherent_safe<> >
 class ADscalar
 {
 public:
    typedef __Alloc                                                     allocator_type;
+   typedef std::size_t                                                 size_type;
    typedef double                                                      value_type;
    typedef double                                                      grad_elem_type;
    typedef fastl::vector_unbounded< grad_elem_type, allocator_type >   gradient_type;
 
-private:
+//private:
+public:
    value_type*   value;
    gradient_type gradient;
 
@@ -22,16 +24,14 @@ public:
       std::cout << "ADscalar()" << std::endl;
    }
 
-
-   ADscalar ( double* _value, double* _gradient, std::size_t _bound )
-      : value(_value), gradient(_gradient, _bound)
+   void assign ( value_type* _p_value, grad_elem_type*  _p_gradient, size_type _upper_bound )
    {
+      value = _p_value;
+      gradient.assign( _p_gradient, _upper_bound );
    }
 
-   void assign ( double* _value, double* _gradient, std::size_t _upper_bound )
+   value_type get_value()
    {
-      value = _value;
-      gradient.assign( _gradient, _upper_bound );
+      return *value;
    }
-
 };

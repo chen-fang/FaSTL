@@ -6,12 +6,13 @@ class ADvector
 {
 public:
    typedef __Alloc                                                   allocator_type;
-   typedef std::size_t                                               size_type;
-   typedef ADscalar :: value_type                                    value_type;
+   typedef typename ADscalar< allocator_type > :: size_type          size_type;
+   typedef typename ADscalar< allocator_type > :: value_type         value_type;
+   typedef typename ADscalar< allocator_type > :: grad_elem_type     grad_elem_type;
+   typedef typename ADscalar< allocator_type > :: gradient_type      gradient_type;
    typedef fastl::vector_unbounded< value_type, allocator_type >     value_storage_type;
-   typedef fastl::vector_unbounded< grad_elem_type, allocator_type > gradient_type;
    typedef fastl::vector_unbounded< grad_elem_type, allocator_type > gradient_storage_type;
-   typedef fastl::vector_unbounded< ADscalar, allocator_type >       ADvector_type;
+   typedef fastl::vector_unbounded< ADscalar< allocator_type >, allocator_type >       ADvector_type;
 
    /*
     * proposed types for the future
@@ -31,20 +32,36 @@ private:
 public:
    // p_capacity is obtained according to upper_bound when it is provided
    // otherwise, use __Capacity_Factor
-   ADvector ( std::size_t _size, allocator_type& _allocator, size_type _upper_bound )
+   ADvector ( size_type _size, allocator_type& _allocator, size_type _upper_bound )
       : manager      ( _size, _allocator ),
 	value_storage( _size, _allocator ),
 	grad_storage ( _size * _upper_bound, _allocator )
    {
       std::cout << "ADvector( size, alloc ) " << std::endl;
-
+      std::cout << "Assigning..." << std::endl;
 
       std::size_t i;
+      value_type* p_value = &value_storage[0];
+      grad_elem_type* p_gradient = &grad_storage[0];
+
       for( i = 0; i < _size; ++i )
       {
-	 ADvector[i].assign( double* _value, double* _grad, std::size_t _upper_bound );
-	 ++_value;
-	 _grad += upper_bound;
+	 manager[i].assign( p_value, p_gradient, _upper_bound );
+
+	 std::cout << "------------------ " << i << std::endl;
+	 std::cout << manager[i].value << std::endl;
+	 std::cout << manager[i].gradient.p_begin << " ---> "
+		   << manager[i].gradient.p_end   << " ---> "
+		   << manager[i].gradient.p_capacity << std::endl << std::endl;
+
+	 ++p_value;
+	 p_gradient += _upper_bound;
       }
    }
+
+   ADscalar<>& operator [] ( std::size_t index )
+   {
+      return manager[ index ];
+   }
+
 };
