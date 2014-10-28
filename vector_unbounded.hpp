@@ -12,18 +12,46 @@ namespace fastl
 	     std::size_t __Capacity_Factor = 1 >
    class vector_unbounded
    {
+   public:
+      typedef __T value_type;
+      typedef __Alloc allocator_type;
+      typedef std::size_t size_type;
+
       //private:
    public:
       __T* p_begin;
       __T* p_end;
       __T* p_capacity;
+     __allocator_type* p_alloc;
 
    public:
       vector_unbounded ()
-	 : p_begin(nullptr), p_end(nullptr), p_capacity(nullptr)
+	 : p_begin(nullptr), p_end(nullptr), p_capacity(nullptr), p_alloc(nullptr)
       {
 	 std::cout << "vector_unbounded()" << std::endl;
       }
+
+      vector_unbounded ( std::size_t _size, __Alloc& _allocator )
+      {
+	 std::cout << "vector_unbounded( size, alloc )" << std::endl;
+	 vector_unbounded_allocate( _size, _allocator );
+	 fastl :: construct_array( p_begin, p_capacity );
+	 fastl :: set_zero( p_begin, p_capacity );
+      }
+
+
+      // template< typename T1, typename... Args >
+      // vector_unbounded ( std::size_t _size, __Alloc& _allocator, T1&& _arg1, Args&&... _args )
+      // {
+      // 	 vector_unbounded_allocate( _size, _allocator );
+      // 	 fastl :: construct_array( p_begin, p_capacity,
+      // 				   std::forward<T1>( _arg1 ),
+      // 				   std::forward<Args...>(_args)... );
+      // }
+      
+      // vector_unbounded ( const_param _clone );
+
+      ~vector_unbounded ( ) {}
 
       inline void assign ( __T* _p, std::size_t _range )
       {
@@ -37,28 +65,11 @@ namespace fastl
       }
 
 
-      vector_unbounded ( std::size_t _size, __Alloc& _allocator )
-      {
-	 std::cout << "vector_unbounded( size, alloc )" << std::endl;
-	 vector_unbounded_allocate( _size, _allocator );
-	 fastl :: construct_array( p_begin, p_capacity );
-	 fastl :: set_zero( p_begin, p_capacity );
-      }
-
-      // template< typename T1, typename... Args >
-      // vector_unbounded ( std::size_t _size, __Alloc& _allocator, T1&& _arg1, Args&&... _args )
-      // {
-      // 	 vector_unbounded_allocate( _size, _allocator );
-      // 	 fastl :: construct_array( p_begin, p_capacity,
-      // 				   std::forward<T1>( _arg1 ),
-      // 				   std::forward<Args...>(_args)... );
-      // }
-      
-      // vector_unbounded ( const_param _clone );
 
 
 
-      ~vector_unbounded ( ) {}
+
+
 
       void print ()
       {
@@ -72,6 +83,7 @@ namespace fastl
 	 p_begin = static_cast<__T*>( _allocator.allocate( _size * sizeof(__T) ) );
 	 p_end = p_begin + _size;
 	 p_capacity = p_begin + _size * __Capacity_Factor;
+	 p_alloc = &_allocator;
       }
 
 
@@ -90,10 +102,26 @@ namespace fastl
       
    //    //.............................  ACCESS  ............................//
 
-   //    bool             is_empty ( ) const;
-   //    bool             is_full ( ) const;
-   //    size_type        size  ( ) const;
-   //    size_type        capacity ( ) const;
+      bool is_empty () const
+      {
+	 return ( p_begin == p_end );
+      }
+
+      bool is_full () const;
+      {
+	 return ( p_end == p_capacity );
+      }
+
+      size_type size () const
+      {
+	 return static_cast< size_type >( p_end - p_begin );
+      }
+
+      size_type capacity () const
+      {
+	 return static_cast< size_type >( p_capacity - p_begin );
+      }
+
 
    //    const_iterator   begin ( ) const;
    //    const_iterator   end   ( ) const;
@@ -102,7 +130,21 @@ namespace fastl
    //    elem_const_param operator[] ( size_type _i ) const;
       
    //    void			   clear_memory ( );
-   //    void             set_zero ( );
+   
+      inline void set_zero ()
+      {
+	 fastl::set_zero( p_begin, p_capacity );
+      }
+
+      inline void resize ( allocator_type& _allocator )
+      {
+
+      }
+
+      inline void reserve ( size_type _size )
+      {
+
+      }
    //    void             reserve ( size_type _n );
    //    void			   clear_reserve ( size_type _n );
    //    void             clear ( );
