@@ -12,6 +12,9 @@ namespace fastl
    //
    struct malloc_alloc
    {
+      malloc_alloc( std::size_t _n )
+      {}
+
       inline void* allocate( std::size_t _n )
       {
 	 return std::malloc( fastl :: detail :: bs_if_equal( _n, 0, ALLOC_0, _n ) );
