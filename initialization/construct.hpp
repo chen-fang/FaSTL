@@ -50,7 +50,7 @@ namespace fastl
    inline void construct ( T* _p )
    {
       std::cout << "construct(p)" << std::endl;
-      fastl :: impl :: do_construct ( _p, std::is_trivial<T>() );
+      impl :: do_construct ( _p, std::is_trivial<T>() );
    }
 
    // nonzero-argument
@@ -78,7 +78,7 @@ namespace fastl
       template< typename T >
       inline void do_construct_array ( T* _start, T* _end, std::false_type )
       {
-	 std::cout << "non_trivial" << std::endl;
+	 //std::cout << "non_trivial" << std::endl;
 	 /* Optimization Advise:
 	  *
 	  * Duff's device
@@ -96,7 +96,7 @@ namespace fastl
       template< typename T >
       inline void do_construct_array ( T* _start, T* _end, std::true_type )
       {
-	 std::cout << "trivial" << std::endl;
+	 //std::cout << "trivial" << std::endl;
 
 	 T* tmp = _start;
 	 while( tmp != _end )
@@ -112,7 +112,7 @@ namespace fastl
    inline void construct_array ( T* _start, T* _end )
    {
       std::cout << "construct_array( "<< _start <<", "<< _end << " ): ";
-      fastl :: impl :: do_construct_array ( _start, _end, std::is_trivial<T>() );
+      impl :: do_construct_array ( _start, _end, std::is_trivial<T>() );
    }
 
    // nonzero-argument: copy_ctor & move_ctor
@@ -122,9 +122,9 @@ namespace fastl
       T* tmp = _start;
       while( tmp != _end )
       {
-	 fastl :: construct( tmp, 
-			     std::forward<T1>(val),
-			     std::forward<Args...>(_args)... );
+	 construct( tmp, 
+		    std::forward<T1>(val),
+		    std::forward<Args...>(_args)... );
 	 ++tmp;
       }
    }

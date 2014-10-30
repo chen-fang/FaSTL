@@ -3,6 +3,7 @@
 //#include "ADvector.hpp"
 
 #include "memory/coherent_fast.hpp"
+#include "initialization/initialization.h"
 #include <iostream>
 #include <vector>
 
@@ -20,31 +21,20 @@ public:
    }
 };
 
-class A : public Base
+class A
 {
 public:
-   int* m_data;
+   Base m_data;
 
-
-   A( std::size_t _size, std::size_t _value )
+   A() : m_data()
    {
       std::cout << "A :: ctor" << std::endl;
-      m_data = new int [_size];
-      std::size_t i;
-      for( i = 0; i < _size; ++i )
-	 m_data[i] = _value;
-   }
-
-   A( A&& other )
-   {
-      std::cout << "A :: move ctor" << std::endl;
-      m_data = other.m_data;
-      other.m_data = nullptr;
    }
 
    ~A()
    {
       std::cout << "A :: dtor" << std::endl;
+      fastl :: destroy( &m_data );
    }
 };
 
@@ -55,7 +45,7 @@ int main()
 
    //typedef fastl::coherent_fast<> ALLOC;
 
-   std::vector<Base> vec(5);
+   A a;
 
 
 

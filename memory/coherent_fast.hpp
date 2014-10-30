@@ -34,7 +34,7 @@ namespace fastl
       }
 
       coherent_fast ( coherent_fast&& _other )
-	 : p_head( other.p_head ), p_available( other.p_available ), counter( other.counter )
+	 : p_head( _other.p_head ), p_available( _other.p_available ), counter( _other.counter )
       {
 	 //std::cout << "co_fast :: move ctor" << std::endl;
 

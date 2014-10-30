@@ -116,8 +116,8 @@ namespace fastl
 
       ~vector ()
       {
-	 fastl::destruct( p_bob, p_eob );
-	 __Alloc::deallocate( p_bob );
+	 fastl :: destroy_array( p_bob, p_eob );
+	 __Alloc :: deallocate( p_bob );
       }
 
    private:
