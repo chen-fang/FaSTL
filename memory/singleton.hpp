@@ -1,14 +1,54 @@
 #include "common_header.h"
+#include <list>
 
-template< typename ALLOC >
-class singleton
+template< typename __ALLOC >
+class pool
 {
 public:
-   typedef ALLOC Alloc_t;
+   typedef __ALLOC                        allocator_type;
+   typedef std::list< allocator_type >    allocator_manager_type;
+
+private:
+   static allocator_manager_type          m_Manager;
+   //static allocator_type                  m_alloc;
+
+protected:
+   pool ( std::size_t _size )
+   {
+      manager.push_back( static_cast< allocator_type*>(nullptr) );
+   }
+
+   pool ( std::size_t _size )
+   {
+      allocator = __ALLOC( _size );
+      manager.push_back( &allocator );
+   }
+
+   static void deallocate( void* _p )
+   {
+      allocator_manager_type::iterator iter;
+      for( iter = m_Manager.begin(); iter != m_Manager.end(); ++iter )
+      {
+	 if( _p == iter->front() )
+	 {
+	    iter -> deallocate( _p );
+	    m_Manager.erase( iter );
+	    break;
+	 }
+      }
+   }
+
+   static void create_allocator ( std::size_t _size )
+   {
+      static allocator_manager_type manager;
+      m_Manager = &( manager );
+      m_Magager.emplace_front( _size );
+   }
+
 
    static void get_instance ( std::size_t n )
    {
-      if( instance == static_cast<Alloc_t*>(nullptr) )
+      if( instance == static_cast<allocator_type*>(nullptr) )
       {
 	 create(n);
       }
@@ -25,20 +65,16 @@ public:
       return instance->allocate<Alignment>(n);
    }
 
-private:
-   static void create ( std::size_t n )
-   {
-      static Alloc_t Alloc(n);
-      instance = &Alloc;
-   }
 
-   static Alloc_t* instance;
+      
+
+
 
    // disable
    singleton() {}
-   singleton( const Alloc_t& clone ) {}
-   singleton( Alloc_t&& mv_cpy ) {}
-   void operator= ( const Alloc_t& clone ) {}
+   singleton( const allocator_type& clone ) {}
+   singleton( allocator_type&& mv_cpy ) {}
+   void operator= ( const allocator_type& clone ) {}
    ~singleton() {}
 };
 

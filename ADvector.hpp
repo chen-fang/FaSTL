@@ -1,67 +1,111 @@
 #pragma once
 #include "ADscalar.hpp"
 
-template< typename __Alloc = fastl::coherent_safe<> >
+
+typedef fastl::coherent_fast<>                      base_allocator_type;
+typedef fastl::pool< base_allocator_type >          default_pool_allocator_type;
+
+
+// __ALLOC must be of singleton type
+template< typename __POOL_ALLOC = default_pool_allocator_type >
+struct __ADvector_base
+   : __POOL_ALLOC
+{
+   typedef adetl::ADscalar< allocator_type >           ADscalar
+   typedef typename ADscalar :: size_type              size_type;
+   typedef typename ADscalar :: value_type             value_type;
+   typedef typename ADscalar :: grad_elem_type         grad_elem_type;
+   typedef typename ADscalar :: gradient_type          gradient_type;
+
+   typedef fastl::vector< ADscalar, allocator_type >   __base_container_type;
+
+   // This is where data is stored
+   __base_container_type _data;
+
+   __ADvector_base ()
+      : __POOL_ALLOC(), _data()
+   {
+   }
+
+   __ADvector_base ( size_type _size )
+      : __POOL_ALLOC( _size * ( sizeof(ADscalar) + sizeof(value_type) ) ),
+	_data( _size )
+   {
+      __POOL_ALLOC :: create_allocator ( size * ( sizeof(ADscalar) + sizeof(value_type) ) );
+   }
+		 
+
+   __ADvector_base ( size_type _size, size_type _upper_bound )
+      : __POOL_ALLOC( _size * ( sizeof(ADscalar) + sizeof(value_type)
+			   + _upper_bound * sizeof(grad_elem_type) ) ),
+	_data( _size )
+   {
+      __POOL_ALLOC :: create_allocator ( _size * ( sizeof(ADscalar) + sizeof(value_type)
+					 + _upper_bound * sizeof(grad_elem_type) ) );
+   }
+
+   ~__ADvector_base ()
+   {
+      // I'm not sure whether this works or not.
+      // standard layout ???
+      __POOL_ALLOC :: deallocate( static_cast<void*>( &_data.front() ) );
+   }
+
+   ADscalar& operator [] ( std::size_t index )
+   {
+      return _data[ index ];
+   }
+};
+
+
+
 class ADvector
 {
 public:
-   typedef __Alloc                                                   allocator_type;
-   typedef typename ADscalar< allocator_type > :: size_type          size_type;
-   typedef typename ADscalar< allocator_type > :: value_type         value_type;
-   typedef typename ADscalar< allocator_type > :: grad_elem_type     grad_elem_type;
-   typedef typename ADscalar< allocator_type > :: gradient_type      gradient_type;
-   typedef fastl::vector_unbounded< value_type, allocator_type >     value_storage_type;
-   typedef fastl::vector_unbounded< grad_elem_type, allocator_type > gradient_storage_type;
-   typedef fastl::vector_unbounded< ADscalar< allocator_type >, allocator_type >       ADvector_type;
+   
 
-   /*
-    * proposed types for the future
-    *
-   typedef fastl::vector_unbounded< gradient_type, allocator_type >  ub_gradient_storage_type;
-   typedef fastl::vector_unbounded< ADscalar, allocator_type >       ub_ADvector_type;
-   typedef fastl::vector_bounded< gradient_type, allocator_type >    b_gradient_storage_type;
-   typedef fastl::vector_bounded< ADscalar, allocator_type >         b_ADvector_type;
-   *
-   */
+   typedef __ADvector_base< allocator_type >                           container_type;
+   //typedef typename ADscalar< allocator_type >                         ADscalar;
+   // typedef typename ADscalar :: size_type            size_type;
+   // typedef typename ADscalar :: value_type           value_type;
+   // typedef typename ADscalar :: grad_elem_type       grad_elem_type;
+   // typedef typename ADscalar :: gradient_type        gradient_type;
+
+   // typedef fastl::vector< ADscalar, allocator_type > container_type;
+
 
 private:
-   ADvector_type          manager;
-   value_storage_type     value_storage;
-   gradient_storage_type  grad_storage;
+   container_type          m_Data;
+
+
 
 public:
-   // p_capacity is obtained according to upper_bound when it is provided
-   // otherwise, use __Capacity_Factor
-   ADvector ( size_type _size, allocator_type& _allocator, size_type _upper_bound )
-      : manager      ( _size, _allocator ),
-	value_storage( _size, _allocator ),
-	grad_storage ( _size * _upper_bound, _allocator )
+   ADvector ()
+      : m_Data()
    {
-      std::cout << "ADvector( size, alloc ) " << std::endl;
-      std::cout << "Assigning..." << std::endl;
+   }
 
-      std::size_t i;
-      value_type* p_value = &value_storage[0];
-      grad_elem_type* p_gradient = &grad_storage[0];
+   ADvector ( size_type _size )
+      : m_Data( _size )
+   {}
 
+   ADvector ( size_type _size, size_type _upper_bound )
+      : m_Data( _size, _upper_bound )
+   {
+      size_type i;
       for( i = 0; i < _size; ++i )
       {
-	 manager[i].assign( p_value, p_gradient, _upper_bound );
-
-	 std::cout << "------------------ " << i << std::endl;
-	 std::cout << manager[i].value << std::endl;
-	 std::cout << manager[i].gradient.p_begin << " ---> "
-		   << manager[i].gradient.p_end   << " ---> "
-		   << manager[i].gradient.p_capacity << std::endl << std::endl;
-
-	 ++p_value;
-	 p_gradient += _upper_bound;
+	 ADvector[i].set_upper_bound( _upper_bound );
       }
+   }
+
+   ~ADvector ()
+   {
    }
 
    ADscalar<>& operator [] ( std::size_t index )
    {
-      return manager[ index ];
+      return m_Data[ index ];
    }
 
 };

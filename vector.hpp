@@ -46,7 +46,7 @@ namespace fastl
       vector ( size_type _size, size_type _capacity = _size )
 	 : __Alloc( _capacity * sizeof(value_type) )
       {
-	 p_bob = __Alloc::allocate( _size );
+	 p_bob = static_cast< value_type* >( __Alloc::allocate( _capacity ) );
 	 p_eos = p_bob + _size;
 	 p_eob = p_bob + _capacity;
 	 fastl::construct( p_bob, p_eob );
@@ -58,7 +58,7 @@ namespace fastl
       {
 	 if( _capacity < _size )
 	    _capacity = _size;
-	 p_bob = __Alloc::allocate( _size );
+	 p_bob = static_cast< value_type* >( __Alloc::allocate( _size ) );
 	 p_eos = p_bob + _size;
 	 p_eob = p_bob + _capacity;
 	 fastl::construct( p_bob, p_eob, _value );
@@ -67,12 +67,51 @@ namespace fastl
       vector ( const_param _clone )
 	 : __Alloc( _clone.capacity() )
       {
-	 const size_type clone_size = _clone.size();
-	 const size_type clone_capaicty = _clone.capacity();
-	 p_bob = __Alloc::allocate( clone_capacity );
-	 p_eos = p_bob + clone_size;
-	 p_eob = p_bob + clone_capacity;
-	 fastl::unitialized_copy( _clone.p_bob, _clone.p_eob, p_bob );
+	 copy_from( _clone );
+      }
+
+     vector ( vector&& _other )
+	: p_bob(nullptr), p_eob(nullptr), p_eos(nullptr)
+     {
+	std::cout << "vector :: move constructor" << std::endl;
+
+	p_bob = _other.p_bob;
+	p_eob = _other.p_eob;
+	p_eos = _other.p_eos;
+
+	_other.p_bob = nullptr;
+	_other.p_eob = nullptr;
+	_other.p_eos = nullptr;
+     }
+
+      vector& operator = ( const vector& _clone )
+      {
+	 std::cout << "vector :: copy assignment" << std::endl;
+
+	 if( this != &_clone )
+	 {
+	    copy_from( _clone );
+	 }
+      	 return *this;
+      }
+
+      vector& operator = ( vector&& _other )
+      {
+	 std::cout << "vector :: move assignment" << std::endl;
+
+	 if( this != &_other )
+	 {
+	    __Alloc::deallocate( p_bob );
+
+	    p_bob = _other.p_bob;
+	    p_eob = _other.p_eob;
+	    p_eos = _other.p_eos;
+
+	    _other.p_bob = nullptr;
+	    _other.p_eob = nullptr;
+	    _other.p_eos = nullptr;
+	 }
+	 return *this;
       }
 
       ~vector ()
@@ -81,7 +120,25 @@ namespace fastl
 	 __Alloc::deallocate( p_bob );
       }
 
+   private:
+      void copy_from( const vector& _clone )
+      {
+	 const size_type clone_capacity = _clone.capacity();
+	 const size_type clone_size = _clone.size();
 
+	 p_bob = static_cast< value_type* >( __Alloc::allocate(clone_capacity) );
+	 if( p_bob == nullptr )
+	 {
+	    std::cout << "vector :: get nullptr from allocator...!!!" << std::endl;
+	    p_eob = p_bob = nullptr;
+	 }
+	 else
+	 {
+	    p_eob = p_bob + clone_capacity;
+	    p_eos = p_bob + clone_size;
+	    fastl::uninitialized_copy(xx,xx,xx);
+	 }
+      }
    
       //...........................  ASSIGNMENT  ..........................//
       

@@ -28,9 +28,29 @@ namespace fastl
 	 p_head = p_available = static_cast<char*>(__Alloc :: allocate(_buffer_size));
       }
 
+      coherent_fast ( const coherent_fast& _clone )
+      {
+	 std::cout << "copy ctor" << std::endl;
+      }
+
+      coherent_fast ( coherent_fast&& _other )
+	 : p_head( other.p_head ), p_available( other.p_available ), counter( other.counter )
+      {
+	 //std::cout << "co_fast :: move ctor" << std::endl;
+
+	 _other.p_head = nullptr;
+	 _other.p_available = nullptr;
+	 _other.counter = 0;
+      }
+
       ~coherent_fast()
       {
 	 __Alloc :: deallocate( static_cast<void*>(p_head) );
+      }
+
+      coherent_fast& operator = ( coherent_fast&& _other )
+      {
+
       }
 
       inline void* allocate( std::size_t _n )
@@ -55,6 +75,10 @@ namespace fastl
 	 counter.reset( p_head, p_available );
       }
 
+      inline void* front ()
+      {
+	 return p_head;
+      }
 
    private:
       template< std::size_t Alignment >
