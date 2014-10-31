@@ -11,6 +11,7 @@ template< typename __POOL_ALLOC = default_pool_allocator_type >
 struct __ADvector_base
    : __POOL_ALLOC
 {
+   typedef __POOL_ALLOC                                allocator_type;
    typedef adetl::ADscalar< allocator_type >           ADscalar
    typedef typename ADscalar :: size_type              size_type;
    typedef typename ADscalar :: value_type             value_type;

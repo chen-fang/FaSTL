@@ -2,10 +2,12 @@
 //#include "ADscalar.hpp"
 //#include "ADvector.hpp"
 
-#include "memory/coherent_fast.hpp"
-#include "initialization/initialization.h"
+//#include "memory/coherent_fast.hpp"
+//#include "initialization/initialization.h"
 #include <iostream>
-#include <vector>
+#include "vector.hpp"
+#include "ADscalar.hpp"
+#include "ADvector.hpp"
 
 class Base
 {
@@ -41,11 +43,14 @@ public:
 
 int main()
 {
-   //fastl::vector_unbounded<double>( 10 );
 
-   //typedef fastl::coherent_fast<> ALLOC;
 
-   A a;
+
+
+   //fastl::vector<double> vec( 4 );
+   ADscalar<> a(111,4);
+   std::cout << a.get_value() << std::endl;
+
 
 
 

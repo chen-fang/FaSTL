@@ -12,8 +12,12 @@ namespace fastl
    //
    struct malloc_alloc
    {
-      malloc_alloc( std::size_t _n )
-      {}
+      malloc_alloc ()
+      {
+	 std::cout << "malloc_alloc()" << std::endl;
+      }
+      malloc_alloc ( std::size_t _n ) {}
+
 
       inline void* allocate( std::size_t _n )
       {
@@ -24,6 +28,11 @@ namespace fastl
       {
 	 std::free( _p );
       }
+
+      // ~malloc_alloc()
+      // {
+      // 	 std::cout << "malloc_alloc :: dtor" << std::endl;
+      // }
    };
 
 

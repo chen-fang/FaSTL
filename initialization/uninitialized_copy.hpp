@@ -22,13 +22,13 @@ namespace fastl
    {
       // non-trivial
       template< typename T >
-      inline T* do_uninitialized_copy ( T* _start, T* _end, T* _dest, std::false_type )
+      inline T* do_uninitialized_copy ( T* _dest, T* _start, T* _end, std::false_type )
       {
-	 T* p = _start;
 	 T* dest = _dest;
+	 T* p = _start;
 	 while( p != _end )
 	 {
-	    fastl :: construct( static_cast<void*>(dest), *p );
+	    *dest = *_start;
 	    ++p;
 	    ++dest;
 	 }
@@ -36,11 +36,11 @@ namespace fastl
       }
       // trivial
       template< typename T >
-      inline T* do_uninitialized_copy ( T* _start, T* _end, T* _dest, std::true_type )
+      inline T* do_uninitialized_copy ( T* _dest, T* _start, T* _end, std::true_type )
       {
-	 void* p_ret = std::memcpy ( static_cast<void*>(_dest),
+	 void* p_ret = std::memmove ( static_cast<void*>(_dest),
 				     static_cast<void*>(_start),
-				     (_end - _start + 1) * sizeof(T) ); // ??? general ???
+				     ( _end - _start ) * sizeof(T) );
 	 return static_cast<T*>( p_ret );
       }
    }
@@ -49,8 +49,8 @@ namespace fastl
 namespace fastl
 {
    template< typename T >
-   inline T* uninitialized_copy ( T* _start, T* _end, T* _dest )
+   inline T* uninitialized_copy ( T* _dest, T* _start, T* _end )
    {
-      return fastl :: impl :: do_uninitialized_copy( _start, _end, _dest, std::is_trivial<T>() );
+      return fastl :: impl :: do_uninitialized_copy( _dest, _start, _end, std::is_trivial<T>() );
    }
 }

@@ -59,6 +59,7 @@ namespace fastl
       template< typename T >
       inline void do_destroy_array( T* _start, T* _end, std::false_type )
       {
+	 std::cout << "non_trivial" << std::endl;
 	 T* tmp = _start;
 	 while( tmp != _end )
 	 {
@@ -70,6 +71,7 @@ namespace fastl
       template< typename T >
       inline void do_destroy_array( T* _start, T* _end, std::true_type )
       {
+	 std::cout << "trivial" << std::endl;
 	 T* tmp = _start;
 	 while( tmp != _end )
 	 {
@@ -83,6 +85,7 @@ namespace fastl
    template< typename T >
    static inline void destroy_array( T* _start, T* _end )
    {
+      std::cout <<"destroy_array( "<< _start<<", "<< _end <<" ): ";
       fastl :: impl :: do_destroy_array( _start, _end, std::is_trivial<T>() );
    }
 }

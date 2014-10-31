@@ -25,6 +25,7 @@ namespace fastl
    public:
       coherent_fast( std::size_t _buffer_size )
       {
+	std::cout << "coherent_fast( size )" << std::endl;
 	 p_head = p_available = static_cast<char*>(__Alloc :: allocate(_buffer_size));
       }
 
