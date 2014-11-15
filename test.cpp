@@ -1,58 +1,20 @@
-//#include "vector_unbounded.hpp"
-//#include "ADscalar.hpp"
-//#include "ADvector.hpp"
+#include "coherent_freelist.hpp"
 
-//#include "memory/coherent_fast.hpp"
-//#include "initialization/initialization.h"
-#include <iostream>
-#include "vector.hpp"
-#include "ADscalar.hpp"
-#include "ADvector.hpp"
-
-class Base
-{
-public:
-   Base()
-   {
-      std::cout << "Base :: ctor" << std::endl;
-   }
-
-   ~Base()
-   {
-      std::cout << "Base :: dtor" << std::endl;
-   }
-};
-
-class A
-{
-public:
-   Base m_data;
-
-   A() : m_data()
-   {
-      std::cout << "A :: ctor" << std::endl;
-   }
-
-   ~A()
-   {
-      std::cout << "A :: dtor" << std::endl;
-      fastl :: destroy( &m_data );
-   }
-};
 
 
 int main()
 {
+   typedef fastl::coherent_freelist<4> freelist;
+   freelist list( 4, 2 );
 
+   void* p1 = list.allocate();
+   void* p2 = list.allocate();
+   void* p3 = list.allocate();
+   void* p4 = list.allocate();
 
-
-
-   //fastl::vector<double> vec( 4 );
-   ADscalar<> a(111,4);
-   std::cout << a.get_value() << std::endl;
-
-
-
+   void* pp1 = list.allocate();
+   list.deallocate( p1 );
+   p1 = list.allocate();
 
    return -1;
 }
