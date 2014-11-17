@@ -4,18 +4,49 @@
 #include <iostream>
 #include <type_traits>  // provides: is_trivial
 
-/** construct
- * 
- * Objective:
+/* 
+ * [ construct ]
  * Call the constructor, including:
  * --> default constructor
  * --> copy constructor
  * --> move constructor
- *
  */
+
+
 
 namespace fastl
 {
+   namespace impl
+   {
+      // non-trivial
+      template< typename T >
+      inline void do_set_zero ( T* _start, T* _end, std::false_type )
+      {
+	 //std::cout << "non-trivial" << std::endl;
+	 /* do nothing */ }
+
+      // trivial
+      template< typename T >
+      inline void do_set_zero ( T* _start, T* _end, std::true_type )
+      {
+	 std::cout << "trivial --> " << (_end-_start)*sizeof(T) << " bytes" << std::endl;
+   	 std::memset( static_cast<void*>(_start),
+   		      0,
+   		      ( _end - _start ) * sizeof(T) );
+      }
+   }
+
+
+   template< typename T >
+   inline void set_zero ( T* _start, T* _end )
+   {
+      //std::cout << "set_zero( "<< _start << ", "<< _end << " )\t";
+      fastl :: impl :: do_set_zero( _start, _end, std::is_trivial<T>() );
+   }
+
+
+
+
    namespace impl
    {
       template< typename T >
@@ -49,7 +80,7 @@ namespace fastl
    template< typename T >
    inline void construct ( T* _p )
    {
-      std::cout << "construct(p)" << std::endl;
+      //std::cout << "construct(p)" << std::endl;
       impl :: do_construct ( _p, std::is_trivial<T>() );
    }
 
@@ -111,8 +142,9 @@ namespace fastl
    template< typename T >
    inline void construct_array ( T* _start, T* _end )
    {
-      std::cout << "construct_array( "<< _start <<", "<< _end << " ): ";
+      //std::cout << "construct_array( "<< _start <<", "<< _end << " ): ";
       impl :: do_construct_array ( _start, _end, std::is_trivial<T>() );
+      fastl :: set_zero( _start, _end );
    }
 
    // nonzero-argument: copy_ctor & move_ctor
@@ -148,31 +180,5 @@ namespace fastl
 
 
 
-   namespace impl
-   {
-      // non-trivial
-      template< typename T >
-      inline void do_set_zero ( T* _start, T* _end, std::false_type )
-      {
-	 std::cout << "non-trivial" << std::endl;
-	 /* do nothing */ }
 
-      // trivial
-      template< typename T >
-      inline void do_set_zero ( T* _start, T* _end, std::true_type )
-      {
-	 std::cout << "trivial --> " << (_end-_start)*sizeof(T) << " bytes" << std::endl;
-   	 std::memset( static_cast<void*>(_start),
-   		      0,
-   		      ( _end - _start ) * sizeof(T) );
-      }
-   }
-
-
-   template< typename T >
-   inline void set_zero ( T* _start, T* _end )
-   {
-      std::cout << "set_zero( "<< _start << ", "<< _end << " )\t";
-      fastl :: impl :: do_set_zero( _start, _end, std::is_trivial<T>() );
-   }
 }
