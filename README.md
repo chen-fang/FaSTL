@@ -1,4 +1,4 @@
 FaSTL
 =====
 
-Fast Template Library
+ADscalar
