@@ -1,4 +1,0 @@
-FaSTL
-=====
-
-Fast Template Library
