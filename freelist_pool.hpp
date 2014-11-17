@@ -22,6 +22,7 @@ namespace fastl
       coherent_freelist ( std::size_t _init, std::size_t _grow )
 	 : Init(_init), Grow(_grow)
       {
+	 std::cout << "freelist()" << std::endl;
 	 static_assert( __chunk_sz > 0, "__chunk_sz <= 0 !!! " );
 	 expand( Init );
       }
