@@ -19,12 +19,14 @@ namespace fastl
    class coherent_freelist : public __Alloc
    {
    public:
-      coherent_freelist ( std::size_t _init, std::size_t _grow )
-	 : Init(_init), Grow(_grow)
+      coherent_freelist ( std::size_t _init_sz, std::size_t _grow_sz )
+	 : InitSize(_init_sz), GrowSize(_grow_sz)
       {
+#ifdef DUMP
 	 std::cout << "freelist()" << std::endl;
+#endif
 	 static_assert( __chunk_sz > 0, "__chunk_sz <= 0 !!! " );
-	 expand( Init );
+	 expand( InitSize );
       }
 
       ~coherent_freelist()
@@ -33,8 +35,9 @@ namespace fastl
 	 for( i = MemBlock_list.begin(); i != MemBlock_list.end(); ++i )
 	 {
 	    __Alloc :: deallocate( *i );
-
-	    std::cout << "=================== destruct------------: " << *i << std::endl;
+#ifdef DUMP
+	    std::cout << "=================== destruct--------------: " << *i << std::endl;
+#endif
 	 }
       }
 
@@ -42,16 +45,18 @@ namespace fastl
       {
 	 if( p_available == nullptr )
 	 {
+#ifdef DUMP
 	    std::cout << "!!! Not enouth space: expand !!!" << std::endl;
-	    expand( Grow );
+#endif
+	    expand( GrowSize );
 	 }
 
 	 void* p_ret = p_available;
 	 p_available = nextof( p_available );
-
+#ifdef DUMP
 	 std::cout << "### allocate:\t" << p_ret << std::endl;
 	 std::cout << "### next:\t" << p_available << std::endl << std::endl;
-
+#endif
 	 return p_ret;
       }
 
@@ -62,9 +67,10 @@ namespace fastl
 	    void* p_tmp = p_available;
 	    p_available =  _p;
 	    nextof( p_available ) = p_tmp;
-
+#ifdef DUMP
 	    std::cout <<"### deallocate:\t" << _p << std::endl;
 	    std::cout <<"### next:\t" << p_tmp << std::endl << std::endl;
+#endif
 	 }
       }
 
@@ -84,13 +90,14 @@ namespace fastl
 	 p_available = __Alloc :: allocate( buffer_size );
 	 MemBlock_list.push_front( p_available );
 	 segregate( _n_chunks, chunk_sz );
-
+#ifdef DUMP
 	 std::cout << "--------------- expand -------------------" << std::endl;
 	 std::cout << "chunk_size = " << chunk_sz << std::endl;
 	 std::cout << "num_chunks = " << _n_chunks << std::endl;
 	 std::cout << "buffer_size = " << buffer_size << std::endl;
 	 std::cout << p_available << " --- --- > " << p_available + buffer_size << std::endl;
 	 std::cout << "------------------------------------------" << std::endl;
+#endif
       }
 
       void segregate( std::size_t _n_chunks, std::size_t _chunk_sz )
@@ -112,8 +119,8 @@ namespace fastl
 
 
    private:
-      std::size_t Init;
-      std::size_t Grow;
+      std::size_t InitSize;
+      std::size_t GrowSize;
 
       void* p_available;
       std::list<void*> MemBlock_list;

@@ -16,7 +16,9 @@ namespace fastl
    {
       malloc_alloc ()
       {
+#ifdef DUMP
 	 std::cout << "malloc_alloc()" << std::endl;
+#endif
       }
       malloc_alloc ( std::size_t _n ) {}
 
@@ -30,11 +32,6 @@ namespace fastl
       {
 	 std::free( _p );
       }
-
-      // ~malloc_alloc()
-      // {
-      // 	 std::cout << "malloc_alloc :: dtor" << std::endl;
-      // }
    };
 
 

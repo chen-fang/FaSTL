@@ -13,23 +13,21 @@ namespace fastl
    class singleton
    {
    private:
+      typedef fastl::singleton<__RequestSize,__InitSize,__GrowSize,__Alloc> this_type;
+      typedef __Alloc allocator_type;
+
       /*
        * Explicit call to the following functions
        * is prohibited.
        */
       singleton();
-      // singleton( singleton<__RequestSize> clone );
-      // singleton( singleton<__RequestSize>& clone );
-      // singleton( const singleton<__RequestSize>& clone );
-      // singleton( singleton<__RequestSize>&& other );
-      // singleton operator = ( singleton<__RequestSize> clone );
-      // singleton operator = ( singleton<__RequestSize>& clone );
-      // singleton operator = ( const singleton<__RequestSize>& clone );
-      // singleton operator = ( singleton<__RequestSize>&& other );
+      singleton( const this_type& clone );
+      singleton( this_type&& rhs );
+      singleton operator = ( const this_type& clone );
+      singleton operator = ( this_type&& rhs );
       ~singleton();
       
    public:
-      typedef __Alloc allocator_type;
 
       static void* allocate ()
       {
