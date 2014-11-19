@@ -1,0 +1,16 @@
+#pragma once
+
+
+#include "fastl/container/array.hpp"
+
+template< typename value_type, typename vector_type >
+vector_type apv ( value_t value, const vector_type& vector )
+{
+   vector_type tmp( vector.size() );
+   for( std::size_t i = 0; i < vector.size(); ++i )
+   {
+      tmp[i] = value + vector[i];
+   }
+   return tmp;
+}
+
