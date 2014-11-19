@@ -1,5 +1,7 @@
 #pragma once
 
+#include "initialization/initialization.h"
+
 template< typename T, typename ALLOC >
 class buffer
 {
@@ -14,6 +16,8 @@ public:
    buffer ( std::size_t _size )
       : size(_size), p_beg( ALLOC::allocate() ), p_end( p_begin+_size )
    {
+      fastl :: construct_array( p_beg, p_end );
+
       std::cout << "buffer :: ctor( size )" << std::endl;
    }
 
@@ -34,7 +38,10 @@ public:
       std::cout << "buffer :: move ctor" << std::endl;
    }
 
-
+   std::size_t size() const
+   {
+      return size;
+   }
 
    T& operator [] ( std::size_t i )
    {
@@ -71,7 +78,7 @@ public:
 
 
 private:
-					   std::size_t size;
+   std::size_t size;
    T* p_beg;
    T* p_end;
 }
