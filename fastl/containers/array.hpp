@@ -43,12 +43,12 @@
 
 namespace fastl { // ------------------------------------------ BEGIN NAMESPACE 
 
-   // --------------------------------  ARRAY  ------------------------------ //
-   /** \class array
-    *  
-    *  Runtime fixed-size heap array container
-    **/
-   // ----------------------------------------------------------------------- //
+  // --------------------------------  ARRAY  ------------------------------ //
+  /** \class array
+   *  
+   *  Runtime fixed-size heap array container
+   **/
+  // ----------------------------------------------------------------------- //
   template< typename __T,
 	    typename __Alloc
 	    >
@@ -78,17 +78,15 @@ namespace fastl { // ------------------------------------------ BEGIN NAMESPACE
       
     array ( size_type _size, const_iterator _itr );
      
-    template< typename __T1, typename __T2 >
-    array ( const Array< __T1, __T2 > & _clone );
+    array ( const this_type & _clone );
      
     ~array ( );
      
     //...........................  ASSIGNMENT  ..........................//
      
-    template< typename __T1, typename __T2 >
-    Array<__T, allocator_type> & operator= (  const Array< __T1, __T2 > & _v_rhs );
+    this_type & operator= (  const this_type & _v_rhs );
     
-    Array<__T, allocator_type> & operator= ( const_reference _s_rhs );
+    this_type & operator= ( const_reference _s_rhs );
      
     //.............................  ACCESS  ............................//
      
@@ -99,8 +97,6 @@ namespace fastl { // ------------------------------------------ BEGIN NAMESPACE
     const_reference  front ( ) const;
     const_reference  back  ( ) const;
     const_reference  operator[] ( size_type _i ) const;
-     
-    void             reinitialize ( );
     
     iterator         begin ( );
     iterator         end   ( );
@@ -109,13 +105,29 @@ namespace fastl { // ------------------------------------------ BEGIN NAMESPACE
     reference        operator[] ( size_type _i );
      
     //.............................  OPERATORS  .........................//
+    void             reinitialize ( );
+ 
+/*  
+    this_type & operator- ( );
+    
+    this_type & operator+= ( const this_type & _rhs );
+    this_type & operator-= ( const this_type & _rhs );
+    this_type & operator*= ( const this_type & _rhs );
+    this_type & operator/= ( const this_type & _rhs );
+    this_type & operator%= ( const this_type & _rhs );
+
+    this_type & operator+= ( const_reference _rhs );
+    this_type & operator-= ( const_reference _rhs );
+    this_type & operator*= ( const_reference _rhs );
+    this_type & operator/= ( const_reference _rhs );
+    this_type & operator%= ( const_reference _rhs );
+ */
    
-    bool operator== ( const_param _v_rhs );
-     
   private:
-    pointer         p_data;
-    const size_type c_size;
-  }; // pod_array
+    pointer p_beg;
+    pointer p_end;
+  
+  }; // array
   
   
 } // ---------------------------------------------------------- END NAMESPACE
