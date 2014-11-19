@@ -79,14 +79,18 @@ namespace fastl { // ------------------------------------------ BEGIN NAMESPACE
     array ( size_type _size, const_iterator _itr );
      
     array ( const this_type & _clone );
+
+    array ( this_type && _other );
      
     ~array ( );
      
     //...........................  ASSIGNMENT  ..........................//
      
-    this_type & operator= (  const this_type & _v_rhs );
+    this_type & operator= ( const this_type & _v_rhs );
     
     this_type & operator= ( const_reference _s_rhs );
+
+    this_type & operator= ( this_type && _other );
      
     //.............................  ACCESS  ............................//
      
@@ -110,6 +114,12 @@ namespace fastl { // ------------------------------------------ BEGIN NAMESPACE
 /*  
     this_type & operator- ( );
     
+    this_type operator+ ( const this_type & _rhs ) const;
+    this_type operator- ( const this_type & _rhs ) const;
+    this_type operator* ( const this_type & _rhs ) const;
+    this_type operator/ ( const this_type & _rhs ) const;
+    this_type operator% ( const this_type & _rhs ) const;
+
     this_type & operator+= ( const this_type & _rhs );
     this_type & operator-= ( const this_type & _rhs );
     this_type & operator*= ( const this_type & _rhs );
@@ -123,6 +133,10 @@ namespace fastl { // ------------------------------------------ BEGIN NAMESPACE
     this_type & operator%= ( const_reference _rhs );
  */
    
+
+    friend this_type stvpstv ( value_type s1, const this_type& vector1,
+			       value_type s2, const this_type& vector2 );
+
   private:
     pointer p_beg;
     pointer p_end;

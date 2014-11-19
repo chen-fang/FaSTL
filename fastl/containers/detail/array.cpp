@@ -73,6 +73,14 @@ namespace fastl { // ----------------------------------------- BEGIN NAMESPACE
    { 
       fastl::uninitialized_copy<__T>( p_beg, _clone.begin(), _clone.end() );
    }
+
+   template< typename __T, typename __A >
+   array<__T,__A>::array ( array<__T,__A>&& _other ) :
+      p_beg( _other.p_beg ), p_end( _other.p_end )
+   {
+      _other.p_beg = nullptr;
+      _other.p_end = nullptr;
+   }
   
    template< typename __T, typename __A > 
    array<__T,__A>::~array ( )
@@ -105,6 +113,16 @@ namespace fastl { // ----------------------------------------- BEGIN NAMESPACE
       return *this;
    }
 
+   template< typename __T, typename __A >
+   inline
+   array<__T,__A> &
+   array<__T,__T>::operator= ( array&& _other )
+   {
+      p_beg = _other.p_beg;
+      p_end = _other.p_end;
+      _other.p_beg = nullptr;
+      _other.p_end = nullptr;
+   }
    //.............................  ACCESS  ............................//
 
    // const
@@ -218,6 +236,57 @@ namespace fastl { // ----------------------------------------- BEGIN NAMESPACE
    {
       // bit shift
    }
+
+   this_type operator+ ( const this_type& _rhs ) const
+   {
+      this_type tmp( _rhs.size() );
+      for( std::size_t i = 0; i < tmp.size(); ++i )
+      {
+	 tmp[i] = v1[i] + v2[i];
+      }
+      return tmp;
+   }
+
+   this_type operator- ( const this_type& _rhs ) const
+   {
+      this_type tmp( _rhs.size() );
+      for( std::size_t i = 0; i < tmp.size(); ++i )
+      {
+	 tmp[i] = v1[i] - v2[i];
+      }
+      return tmp;
+   }
+
+   this_type operator* ( const this_type& _rhs ) const
+   {
+      this_type tmp( _rhs.size() );
+      for( std::size_t i = 0; i < tmp.size(); ++i )
+      {
+	 tmp[i] = v1[i] * v2[i];
+      }
+      return tmp;
+   }
+
+   this_type operator/ ( const this_type& _rhs ) const
+   {
+      this_type tmp( _rhs.size() );
+      for( std::size_t i = 0; i < tmp.size(); ++i )
+      {
+	 tmp[i] = v1[i] / v2[i];
+      }
+      return tmp;
+   }
+
+   this_type operator% ( const this_type& _rhs ) const
+   {
+      this_type tmp( _rhs.size() );
+      for( std::size_t i = 0; i < tmp.size(); ++i )
+      {
+	 tmp[i] = v1[i] % v2[i];
+      }
+      return tmp;
+   }
+
 
    this_type & operator+= ( const this_type& _rhs )
    {
