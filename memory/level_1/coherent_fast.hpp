@@ -24,7 +24,7 @@ namespace fastl
    public:
       coherent_fast( std::size_t _buffer_size )
       {
-	 p_head = p_available = static_cast<char*>(__Alloc :: allocate(_buffer_size));
+	 expand( _buffer_size );
       }
 
       ~coherent_fast()
@@ -35,6 +35,25 @@ namespace fastl
       // Requirement: _n != 0
       inline void* allocate( std::size_t _n )
       {
+	 /* 
+       * Important Note:
+       * allocate(0) is supported for specific purpose.
+       * It returns "p_available" without the need to implement an extra function
+       * which exposes inner data structure of ths allocator.
+       * But the returned pointer should NEVER be used~!!!
+       *
+       * Possible application: vector.resize( n )
+       * If vector.p_end () == static_cast<T*>( ALLOC::allocate(0) ), expand
+       * without assigning a new allocator to the vector.
+       */
+	 if( _n == 0 )
+	    return p_available;
+
+	 char* p_ret = p_available;
+	 p_available += _n;
+	 ++counter;
+	 return p_ret;
+
 	 /*
 	  * if _n == 0, allocate( ALLOC_0 )
 
@@ -45,10 +64,7 @@ namespace fastl
 	 return p_ret;
 
 	 */
-	 char* p_ret = p_available;
-	 p_available += _n;
-	 ++counter;
-	 return p_ret;
+	 
       }
 
 #ifdef FASTL_SSE
@@ -56,12 +72,6 @@ namespace fastl
        * Optimization Option
        * Allocated space will begin on the boundary of 16 required by SSE.
        */
-      
-      // template< std::size_t Alignment >
-      // inline void* allocate ( std::size_t _n )
-      // {
-      // 	 return __allocate ( _n, std::integral_constant<std::size_t, Alignment>() );
-      // }
 #endif
 
 #ifdef FASTL_AVX
@@ -70,8 +80,6 @@ namespace fastl
        * Allocated space will begin on the boundary of 32 required by AVX.
        */
 #endif
-
-
 
 
       inline void deallocate( void* _p )
@@ -83,39 +91,17 @@ namespace fastl
 	 }
       }
 
+   protected:
+      char* expand ( std::size_t _grow_size )
+      {
+	 p_head = p_available = static_cast<char*>(__Alloc :: allocate(_grow_size));
+	 return p_head;
+      }
 
    private:
-      /* 
-       * ------------Called by aligned_allocate() -----------------
-       *
-      template< std::size_t Alignment >
-      inline void* __allocate ( std::size_t _n, std::integral_constant<std::size_t, Alignment>  )
-      {
-	 static_assert( Alignment == ((Alignment >> (int)std::log2(Alignment))
-	 			      << (int)std::log2(Alignment)),
-	 		"Alignment boundary MUST be the power of 2 !!!" );
-
-	 std::size_t test_sz = fastl :: detail :: bs_if_equal( _n, 0, ALLOC_0, _n );
-	 std::size_t padding = ( p_available - p_head ) % Alignment;
-	 padding = fastl :: detail :: bs_if_equal( padding, 0, 0, Alignment-padding );
-	 p_available += padding;
-	 void* p_ret = static_cast<void*>( p_available );
-	 p_available += test_sz;
-	 ++counter;
-	 return p_ret;
-      }
-
-      inline void* __allocate ( std::size_t _n, std::integral_constant<std::size_t, 0> )
-      {
-	 return allocate(_n);
-      }
-      *
-      */
-
-
-      char* p_head;
-      char* p_available;
-      __Recycle counter;
+      char*        p_head;
+      char*        p_available;
+      __Recycle    counter;
    };
    //
    // END OF NAMESPACE
