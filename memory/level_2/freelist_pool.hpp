@@ -1,15 +1,12 @@
 #pragma once
 
-/* Level 2 */
-
-// Assumption #1
-// ---> in template parameter: __chunk_sz >= sizeof(void*)
-// Assumption #2:
-// ---> in allocate( n ): n <= __chunk_sz
+/* 
+ * Level 2 
+ * Memory pool built on coherent_freelist.
+ */
 
 #include "common_header.h"
-
-#include "malloc_alloc.hpp"
+#include "../level_1/coherent_freelist.hpp"
 #include <list>
 
 namespace fastl
