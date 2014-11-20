@@ -1,20 +1,22 @@
 #pragma once
 
-/* Level 1 */
+/*
+ * Level 1
+ * Allocation from the system directly.
+ * This is the base allocator for all allocators.
+ */
 
-#include "common_header.h"
-
-#include "helper_function/helper_function.hpp"
+#include "include_header.h"
 
 namespace fastl
 {
-   // BEGIN OF NAMESPACE //
-   //
    struct malloc_alloc
    {
       malloc_alloc ()
       {
+#ifdef DUMP_MALLOC
 	 std::cout << "malloc_alloc()" << std::endl;
+#endif
       }
       malloc_alloc ( std::size_t _n ) {}
 
@@ -28,11 +30,6 @@ namespace fastl
       {
 	 std::free( _p );
       }
-
-      // ~malloc_alloc()
-      // {
-      // 	 std::cout << "malloc_alloc :: dtor" << std::endl;
-      // }
    };
 
 
@@ -49,6 +46,5 @@ namespace fastl
       }
 
    };
-   //
    // END OF NAMESPACE //
 }
