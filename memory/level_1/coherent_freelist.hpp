@@ -7,56 +7,48 @@
 // Assumption #2:
 // ---> in allocate( n ): n <= __chunk_sz
 
-#include "common_header.h"
-
+#include "include_header.h"
 #include "malloc_alloc.hpp"
-#include <list>
 
 namespace fastl
 {
+   // BEGIN OF NAMESPACE
+   //
    template< std::size_t __chunk_sz,
 	     typename __Alloc = fastl :: malloc_alloc >
    class coherent_freelist : public __Alloc
    {
    public:
-      coherent_freelist ( std::size_t _init_sz, std::size_t _grow_sz )
-	 : InitSize(_init_sz), GrowSize(_grow_sz)
+      coherent_freelist ( std::size_t _chunk_num )
       {
-#ifdef DUMP
-	 std::cout << "freelist()" << std::endl;
+#ifdef DUMP_FREELIST
+	 std::cout << "freelist( num_chunk )" << std::endl;
 #endif
+
 	 static_assert( __chunk_sz > 0, "__chunk_sz <= 0 !!! " );
-	 expand( InitSize );
+	 expand( _chunk_num );
       }
 
       ~coherent_freelist()
       {
-	 std::list<void*>::iterator i;
-	 for( i = MemBlock_list.begin(); i != MemBlock_list.end(); ++i )
-	 {
-	    __Alloc :: deallocate( *i );
-#ifdef DUMP
+#ifdef DUMP_FREELIST
 	    std::cout << "=================== destruct--------------: " << *i << std::endl;
 #endif
-	 }
+
+	    __Alloc :: deallocate( p_head );
       }
 
-      void* allocate ()
+      void* allocate ( std::size_t _n )
       {
-	 if( p_available == nullptr )
+	 if( _n > _chunk_sz || p_available == nullptr )
 	 {
-#ifdef DUMP
-	    std::cout << "!!! Not enouth space: expand !!!" << std::endl;
-#endif
-	    expand( GrowSize );
+	    return nullptr;
 	 }
+	 // if( _n == 0 ) ??? neccessary ???
 
 	 void* p_ret = p_available;
 	 p_available = nextof( p_available );
-#ifdef DUMP
-	 std::cout << "### allocate:\t" << p_ret << std::endl;
-	 std::cout << "### next:\t" << p_available << std::endl << std::endl;
-#endif
+
 	 return p_ret;
       }
 
@@ -67,7 +59,8 @@ namespace fastl
 	    void* p_tmp = p_available;
 	    p_available =  _p;
 	    nextof( p_available ) = p_tmp;
-#ifdef DUMP
+
+#ifdef DUMP_FREELIST
 	    std::cout <<"### deallocate:\t" << _p << std::endl;
 	    std::cout <<"### next:\t" << p_tmp << std::endl << std::endl;
 #endif
@@ -75,7 +68,7 @@ namespace fastl
       }
 
 
-   private:
+   protected:
       std::size_t alloc_size ()
       {
 	 std::size_t chunk_sz = std::max( __chunk_sz, sizeof(void*) );
@@ -87,10 +80,10 @@ namespace fastl
       {
 	 std::size_t chunk_sz = alloc_size();
 	 std::size_t buffer_size = _n_chunks * chunk_sz;
-	 p_available = __Alloc :: allocate( buffer_size );
-	 MemBlock_list.push_front( p_available );
+	 p_head = p_available = static_cast<char*>(__Alloc :: allocate( buffer_size ));
 	 segregate( _n_chunks, chunk_sz );
-#ifdef DUMP
+
+#ifdef DUMP_FREELIST
 	 std::cout << "--------------- expand -------------------" << std::endl;
 	 std::cout << "chunk_size = " << chunk_sz << std::endl;
 	 std::cout << "num_chunks = " << _n_chunks << std::endl;
@@ -102,11 +95,11 @@ namespace fastl
 
       void segregate( std::size_t _n_chunks, std::size_t _chunk_sz )
       {
-	 void* p_run = p_available;
+	 char* p_run = p_available;
   
 	 for(std::size_t i = 1; i < _n_chunks; ++i)
 	 {
-	    nextof( p_run ) = static_cast<void*>( static_cast<char*>( p_run ) + _chunk_sz );
+	    nextof( p_run ) = static_cast<void*>(  p_run + _chunk_sz );
 	    p_run = nextof( p_run );
 	 }
 	 nextof( p_run ) = nullptr;
@@ -119,10 +112,10 @@ namespace fastl
 
 
    private:
-      std::size_t InitSize;
-      std::size_t GrowSize;
-
-      void* p_available;
-      std::list<void*> MemBlock_list;
+      //std::size_t    chunk_num;
+      char*          p_head;
+      char*          p_available;
    };
+   //
+   // END OF NAMESPACE
 }
