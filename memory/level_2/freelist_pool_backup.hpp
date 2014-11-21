@@ -13,51 +13,44 @@ namespace fastl
 {
    template< std::size_t __chunk_sz,
 	     typename __Alloc = fastl :: malloc_alloc >
-   class freelist_pool : public __Alloc
+   class coherent_freelist : public __Alloc
    {
    public:
-      freelist_pool ( std::size_t _init_num, std::size_t _grow_num )
-	 : InitNum(_init_num), GrowNum(_grow_num)
+      coherent_freelist ( std::size_t _init_sz, std::size_t _grow_sz )
+	 : InitSize(_init_sz), GrowSize(_grow_sz)
       {
-#ifdef DUMP_FREELIST
+#ifdef DUMP
 	 std::cout << "freelist()" << std::endl;
 #endif
 	 static_assert( __chunk_sz > 0, "__chunk_sz <= 0 !!! " );
-	 expand( InitNum );
+	 expand( InitSize );
       }
 
-      ~freelist_pool()
+      ~coherent_freelist()
       {
 	 std::list<void*>::iterator i;
 	 for( i = MemBlock_list.begin(); i != MemBlock_list.end(); ++i )
 	 {
 	    __Alloc :: deallocate( *i );
-#ifdef DUMP_FREELIST
+#ifdef DUMP
 	    std::cout << "=================== destruct--------------: " << *i << std::endl;
 #endif
 	 }
       }
 
-      void* allocate ( std::size_t _n )
+      void* allocate ()
       {
-	 if( _n > _chunk_sz )
-	 {
-	    return nullptr;
-	 }
-	 
 	 if( p_available == nullptr )
 	 {
-#ifdef DUMP_FREELIST
+#ifdef DUMP
 	    std::cout << "!!! Not enouth space: expand !!!" << std::endl;
 #endif
-	    
 	    expand( GrowSize );
 	 }
 
 	 void* p_ret = p_available;
 	 p_available = nextof( p_available );
-	 
-#ifdef DUMP_FREELIST
+#ifdef DUMP
 	 std::cout << "### allocate:\t" << p_ret << std::endl;
 	 std::cout << "### next:\t" << p_available << std::endl << std::endl;
 #endif
@@ -71,7 +64,7 @@ namespace fastl
 	    void* p_tmp = p_available;
 	    p_available =  _p;
 	    nextof( p_available ) = p_tmp;
-#ifdef DUMP_FREELIST
+#ifdef DUMP
 	    std::cout <<"### deallocate:\t" << _p << std::endl;
 	    std::cout <<"### next:\t" << p_tmp << std::endl << std::endl;
 #endif
@@ -94,8 +87,7 @@ namespace fastl
 	 p_available = __Alloc :: allocate( buffer_size );
 	 MemBlock_list.push_front( p_available );
 	 segregate( _n_chunks, chunk_sz );
-	 
-#ifdef DUMP_FREELIST
+#ifdef DUMP
 	 std::cout << "--------------- expand -------------------" << std::endl;
 	 std::cout << "chunk_size = " << chunk_sz << std::endl;
 	 std::cout << "num_chunks = " << _n_chunks << std::endl;
@@ -124,8 +116,8 @@ namespace fastl
 
 
    private:
-      std::size_t InitNum;
-      std::size_t GrowNum;
+      std::size_t InitSize;
+      std::size_t GrowSize;
 
       void* p_available;
       std::list<void*> MemBlock_list;
