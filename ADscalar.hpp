@@ -25,7 +25,14 @@ public:
       : m_value( static_cast< value_type* >( ALLOC_V :: allocate() ) ),
 	m_gradient()
    {
-      *m_value = _value;
+      *(m_value) = _value;
+   }
+
+   ADscalar ( double _value, const gradient_type& _grad )
+      : m_value( static_cast< value_type* >( ALLOC_V :: allocate() ) ),
+	m_gradient( _grad )
+   {
+      *(m_value) = _value;
    }
 
    ADscalar ( const ADscala& _clone )
@@ -41,6 +48,10 @@ public:
    {
       _other.m_value = nullptr;
    }
+
+   // Assignment
+   ADscalar& operator = ( const ADscalar& _clone );
+   ADscalar& operator = ( ADscalar&& _clone );
 
    // data access
    double value () { return *m_value; }
@@ -60,61 +71,9 @@ public:
 
    }
 
-   // operator overloading
-   ADscalar& operator = ( const ADscalar& _clone );
-   ADscalar& operator = ( ADscalar&& _clone );
+
    
-   friend ADscalar operator + ( const ADscalar& _ad, double _value );
-   friend ADscalar operator + ( double _value, const ADscalar& _ad );
 
-   // ------------------------------------------------------------- operator '+='/'-='/'*=' /'/='
-   // +=
-   ADscalar& operator += ( double _value )
-   {
-      m_value += _value;
-      return *this;
-   }
-   ADscalar& operator += ( const ADscalar& _rhs )
-   {
-      m_value += _rhs.value();
-      m_gradient += _rhs.gradient();
-      return *this;
-   }
-   // -=
-   ADscalar& operator -= ( double _value )
-   {
-      m_value -= _value;
-      return *this;
-   }
-   ADscalar& operator -= ( const ADscalar& _rhs )
-   {
-      m_value -= _rhs.value();
-      m_gradient -= _rhs.gradient();
-      return *this;
-   }
-   // *=
-   ADscalar& operator *= ( double _value )
-   {
-      m_value *= _value;
-      m_gradient *= _value;
-      return *this;
-   }
-   ADscalar& operator *= ( const ADscalar& _rhs )
-   {
-      double v = m_value;
-      m_value *= _rhs.value();
-      m_gradient = v * _rhs.gradient() + _rhs.value() * m_gradient();
-      return *this;
-   }
-   ADscalar& operator /= ( double _value )
-   {
-      m_value /= _value;
-      return *this;
-   }
-   ADscalar& operator /= ( const ADscalar& _rhs )
-   {
-
-   }
 
 
 private:
@@ -122,15 +81,12 @@ private:
    gradient_type  m_gradient;
 };
 
-
-
-
    
    // ------------------------------------------------------------- operator =
    ADscalar& ADscalar :: operator = ( const ADscalar& _clone )
    {
-      *(m_value) = *( _clone.value );
-      m_gradient = _clone.m_gradient;
+      this->value() = _clone.value();
+      this->gradient() = _clone.gradient();
       return *this;
    }
 
@@ -145,64 +101,36 @@ private:
    }
 
    // ------------------------------------------------------------- operator +
-   ADscalar& ADscalar :: operator + ( double _value )
+   ADscalar operator + ( double _value, const ADscalar& _ad )
    {
-      m_value += _value;
-      return *this;
+      return ADscalar( _value + _ad.value(), _ad.gradient() );
    }
 
-   ADscalar& ADscalar :: operator + ( const ADscalar& _other )
+   ADscalar operator + ( const ADscalar& _ad, double _value )
    {
-      m_value += _other.m_value;
-      tmp.gradient() = _left.gradient() + _right.gradient(); // move
-      return tmp;
+      return ( _value + _ad );
    }
 
-   // ------------------------------------------------------------- operator '+='/'-='/'*=' /'/='
-   // +=
-   ADscalar& ADscalar :: operator += ( double _value )
+   ADscalar operator + ( const ADscalar& _ad1, const ADscalar& _ad2 )
    {
-      m_value += _value;
-      return *this;
+      retrun ADscalar( _ad1.value() + _ad2.value(),
+		       _ad1.gradient() + _ad2.gradient() );
    }
-   ADscalar& ADscalar :: operator += ( const ADscalar& _rhs )
-   {
-      m_value += _rhs.value();
-      m_gradient += _rhs.gradient();
-      return *this;
-   }
-   // -=
-   ADscalar& ADscalar :: operator -= ( double _value )
-   {
-      m_value -= _value;
-      return *this;
-   }
-   ADscalar& ADscalar :: operator -= ( const ADscalar& _rhs )
-   {
-      m_value -= _rhs.value();
-      m_gradient -= _rhs.gradient();
-      return *this;
-   }
-   // *=
-   ADscalar& ADscalar :: operator *= ( double _value )
-   {
-      m_value *= _value;
-      m_gradient *= _value;
-      return *this;
-   }
-   ADscalar& ADscalar :: operator *= ( const ADscalar& _rhs )
-   {
-      double v = m_value;
-      m_value *= _rhs.value();
-      m_gradient = v * _rhs.gradient() + _rhs.value() * m_gradient();
-      return *this;
-   }
-   ADscalar& ADscalar :: operator /= ( double _value )
-   {
-      m_value /= _value;
-      return *this;
-   }
-   ADscalar& ADscalar :: operator /= ( const ADscalar& _rhs )
-   {
 
+   // ------------------------------------------------------------- operator *
+   ADscalar operator * ( double _value, const ADscalar& _ad )
+   {
+      return ADscalar( _value * _ad.value(), stv( _value, _ad ) );
    }
+
+   ADscalar operator * ( const ADscalar& _ad, double _value )
+   {
+      return ( _value * _ad );
+   }
+
+   ADscalar operator * ( const ADscalar& _ad1, const ADscalar& _ad2 )
+   {
+      return ADscalar( _ad1.value() * _ad2.value(),
+		       stvpstv( _ad1.value(), _ad2.gradient(), _ad2.value(), _ad1.gradient() );
+   }
+
