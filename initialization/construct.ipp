@@ -30,17 +30,14 @@ namespace fastl
    void CTR<T> :: set_value ( T* _p_beg, T* _p_end, T value )
    {
       std::ptrdiff_t size = _p_end - _p_beg;
-      if( size <= 10000 )
+      std::size_t threshold = 10;
+      if( size <= threshold )
       {
-	 for( std::ptrdiff_t i = 0; i < size; ++i )
-	 {
-	    *_p_beg = value;
-	    ++_p_beg;
-	 }
+	 fastl :: impl :: direct_assignment( _p_beg, size, value );
       }
       else
       {
-	 fastl :: impl :: recursive_copy( _p_beg, _p_end, value );
+	 fastl :: impl :: recursive_assignment( _p_beg, _p_end, size, threshold, value );
       }
    }
 
