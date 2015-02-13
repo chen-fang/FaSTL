@@ -17,7 +17,8 @@
  * chunk_size - adjusted chunk size based on __USER_CHUNK_SIZE
  * mb - memory block
  * chunk - memory chunk
- *
+ * n - number
+ * sz/size - size in bytes
  */
 
 template< typename T >
@@ -35,8 +36,8 @@ void print ( T1 c1, T2 c2 )
 namespace fastl
 {
    template< std::size_t __USER_CHUNK_SIZE,
-	     typename __Alloc = fastl :: malloc_alloc >
-   class freelist_pool : public __Alloc
+	     typename __ALLOC = fastl :: malloc_alloc >
+   class freelist_pool : public __ALLOC
    {
    public:
       freelist_pool ( std::size_t _init_n_chunk )
@@ -73,11 +74,15 @@ namespace fastl
 	    std::cout << "=================== destruct--------------: " << p_destroy << std::endl;
 #endif
 
-	    __Alloc :: deallocate( p_destroy );
+	    __ALLOC :: deallocate( p_destroy );
 	    p_destroy = MemBlock_List;
 	 }
       }
 
+      /*
+       * Allocate one chunk from the pool.
+       * If no chunk is available, expand the pool and allocate.
+       */
       void* allocate ()
       {
 	 if( p_available == nullptr )
@@ -97,6 +102,18 @@ namespace fastl
 	 std::cout << "### next:\t" << p_available << std::endl << std::endl;
 #endif
 	 return p_ret;
+      }
+
+      void* allocate ( std::size_t _alloc_size )
+      {
+	 if( _alloc_size > chunk_size )
+	 {
+	    std::cout << "### LIBRARY ERROR MESSAGE ###" << std::endl
+		      << "### allocate size > pool chunk size ###" << std::endl
+		      << "### in freelist_pool::allocate( _alloc_size) ###" << std::endl;
+	    return nullptr;
+	 }
+	 return allocate();
       }
 
       void deallocate( void* _p_dealloc )
@@ -119,7 +136,7 @@ namespace fastl
       void expand ( std::size_t _num_chunk )
       {
 	 std::size_t mb_sz = header_size() + _num_chunk * chunk_size;
-	 void* p_mb_head = __Alloc :: allocate( mb_sz );
+	 void* p_mb_head = __ALLOC :: allocate( mb_sz );
 	 p_available = static_cast<void*>( static_cast<char*>(p_mb_head) + header_size() );
 
 	 Add_MemBlock( p_mb_head );

@@ -1,58 +1,57 @@
 #pragma once
 
-#include "common_header.h"
-#include "freelist_pool.hpp"
+//#include "common_header.h"
+#include "level_2/freelist_pool.hpp"
 
 
 namespace fastl
 {
-   template< std::size_t __RequestSize,
-	     std::size_t __InitSize,
-	     std::size_t __GrowSize,
-	     typename __Alloc = fastl :: coherent_freelist< __RequestSize > >
+   template< std::size_t __USER_CHUNK_SIZE,
+	     std::size_t __USER_INIT_N_CHUNK,
+	     std::size_t __USER_GROW_N_CHUNK = __USER_INIT_N_CHUNK,
+	     typename __ALLOC = fastl :: freelist_pool< __USER_CHUNK_SIZE > >
    class singleton
    {
-   private:
-      typedef fastl::singleton<__RequestSize,__InitSize,__GrowSize,__Alloc> this_type;
-      typedef __Alloc allocator_type;
+   public:
+      typedef singleton< __USER_CHUNK_SIZE,
+			 __USER_INIT_N_CHUNK,
+			 __USER_GROW_N_CHUNK,
+			 __ALLOC >                   this_type;
+      typedef __ALLOC                                allocator_type;
 
-      /*
-       * Explicit call to the following functions
-       * is prohibited.
-       */
+      static allocator_type& get_allocator()
+      {
+       	 static allocator_type pool( __USER_INIT_N_CHUNK, __USER_GROW_N_CHUNK );
+ 	 return pool;
+      }
+
+      
+   public:
+      static void* allocate ()
+      {
+	 allocator_type& allocator = get_allocator();
+	 return allocator.allocate();
+      }
+
+      static void* allocate ( std::size_t _alloc_size )
+      {
+	 allocator_type& allocator = get_allocator();
+	 return allocator.allocate( _alloc_size );
+      }
+
+      static void deallocate ( void* _p_dealloc )
+      {
+	 allocator_type& allocator = get_allocator();
+	 allocator.deallocate( _p_dealloc );
+      }
+
+   private:
+      /* Disable ctors & dtors explicitly */
       singleton();
       singleton( const this_type& clone );
       singleton( this_type&& rhs );
       singleton operator = ( const this_type& clone );
       singleton operator = ( this_type&& rhs );
       ~singleton();
-      
-   public:
-
-      static void* allocate ()
-      {
-	 allocator_type& alloc = get_allocator();
-	 return alloc.allocate();
-      }
-
-      static void deallocate ( void* _p )
-      {
-	 allocator_type& alloc = get_allocator();
-	 alloc.deallocate( _p );
-      }
-
-   private:
-      static allocator_type& get_allocator()
-      {
-	 // static bool is_first_time = true;
-	 // if( is_first_time )
-	 // {
-	 //    static allocator_type pool( __InitSize, __GrowSize );
-	 //    is_first_time = false;
-	 // }
-
-	 static allocator_type pool( __InitSize, __GrowSize );
-	 return pool;
-      }
    };
 }
