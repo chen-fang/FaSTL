@@ -79,7 +79,7 @@ namespace fastl { // ----------------------------------------- BEGIN NAMESPACE
    { 
       //copy_from ( _clone );
       typedef array<__A>:: value_type T;
-      fastl::CTR<T>:: uninitialized_copy( p_beg, _clone.p_beg, _clone.p_beg+N );
+      fastl::CTR<double>:: uninitialized_copy( p_beg, _clone.p_beg, _clone.p_beg+N );
    }
 
    template< typename __A >
@@ -98,19 +98,6 @@ namespace fastl { // ----------------------------------------- BEGIN NAMESPACE
    }
 
    //...........................  ASSIGNMENT  ..........................//
-   
-   template< typename __A > 
-   inline
-   array<__A> &
-   array<__A> :: operator= ( const array<__A> & _v_rhs )
-   {
-      if ( p_beg != _v_rhs.p_beg )
-      {
-	 typedef array<__A>::value_type T;
-	 fastl::CTR<T>:: uninitialized_copy( p_beg, _v_rhs.p_beg, _v_rhs.p_beg+_v_rhs.N );
-      }
-      return *this;
-   }
 
    template< typename __A > 
    inline
@@ -120,6 +107,27 @@ namespace fastl { // ----------------------------------------- BEGIN NAMESPACE
       set_value ( _s_rhs );
       return *this;
    }
+   
+   template< typename __A > 
+   inline
+   array<__A> &
+   array<__A> :: operator= ( const array<__A> & _v_rhs )
+   {
+      /* Possible bug:
+       *    - not neccessarily 'un-initialized-copy'
+       */
+      typedef array<__A>::value_type   T;
+
+      if( p_beg == _v_rhs.begin )
+	 return *this;
+
+      if ( N < _v_rhs.size() )
+      {
+	 resize( _v_rhs.size() );
+      }
+      fastl::CTR<T>:: uninitialized_copy( p_beg, _v_rhs.beg(), _v_rhs.end() );
+      return *this;
+   }
 
    template< typename __A >
    inline
@@ -127,7 +135,7 @@ namespace fastl { // ----------------------------------------- BEGIN NAMESPACE
    array<__A> :: operator= ( array<__A> && _v_rhs )
    {
       typedef array<__A>::pointer pointer;
-      pointer doom = p_beg;
+      pointer p_dealloc = p_beg;
 
       N = _v_rhs.N;
       p_beg = _v_rhs.p_beg;
@@ -186,7 +194,7 @@ namespace fastl { // ----------------------------------------- BEGIN NAMESPACE
    typename array<__A>::const_iterator
    array<__A> :: end ( ) const
    {
-      return (p_beg + N);
+      return ( p_beg + N );
    }
 
    template< typename __A > 
@@ -270,30 +278,43 @@ namespace fastl { // ----------------------------------------- BEGIN NAMESPACE
 
    template< typename __A > 
    inline
-   void array<__A>::set_value ( const_reference _rhs )
+   void array<__A>::set_value ( const_reference _value )
    {
       typedef array<__A>:: value_type T;
-      fastl :: CTR<T> :: set_value( p_beg, p_beg+N, _rhs );
+      fastl :: CTR<T> :: set_value( p_beg, p_beg+N, _value );
    }
 
    template< typename __A >
    inline
-   bool array<__A> :: resize( array<__A>::size_type _n )
+   bool array<__A> :: resize( array<__A>::size_type _new_size )
    {
-      bool is_successful = true;
+      /* Default: keep contents */
+      return resize_keep( _new_size );
+   }
 
-      if( _n <= N )   N = _n;
+   template< typename __A >
+   inline
+   bool array<__A> :: resize_keep( array<__A>::size_type _new_size )
+   {
+      /* keep contents after resize */
+      if(  N < _new_size )      N = _new_size;
       else
       {
-	 typedef array<__A>::pointer pointer;
-	 typedef array<__A>::value_type T;
-	 pointer p = static_cast<pointer>( __A::allocate( _n*sizeof(T) ) );
-	 if( p != nullptr )
+	 typedef array<__A>::pointer      pointer;
+	 typedef array<__A>::value_type   T;
+
+	 pointer p_new = static_cast<pointer>( __A::allocate( _new_size * sizeof(T) ) );
+	 bool is_successful = true;
+	 if( p_new != nullptr )
 	 {
-	    N = _n;
-	    pointer doom = p_beg;
-	    p_beg = p;
-	    __A::deallocate( doom );
+	    fastl::CTR<T>::set_zero( p_new, p_new+_new_size );
+	    fastl::CTR<T>::uninitialized_copy( p_new, p_beg, p_beg+N );
+
+	    pointer p_dealloc = p_beg;
+	    N = _new_size;
+	    p_beg = p_new;
+
+	    __A::deallocate( p_dealloc );
 	 }
 	 else
 	 {
@@ -303,6 +324,32 @@ namespace fastl { // ----------------------------------------- BEGIN NAMESPACE
       return is_successful;
    }
 
+   template< typename __A >
+   inline
+   bool array<__A> :: resize_discard ( array<__A>::size_type _new_size )
+   {
+      /* discard contents after resize */
+      if(  N < _new_size )      N = _new_size;
+      else
+      {
+	 typedef array<__A>::pointer      pointer;
+	 typedef array<__A>::value_type   T;
+	 pointer p_new = static_cast<pointer>( __A::allocate( _new_size * sizeof(T) ) );
+	 bool is_successful = true;
+	 if( p_new != nullptr )
+	 {
+	    pointer p_dealloc = p_beg;
+	    N = _new_size;
+	    p_beg = p_new;
+	    __A::deallocate( p_dealloc );
+	 }
+	 else
+	 {
+	    is_successful = false;
+	 }
+      }
+      return is_successful;
+   }
    //.............................  DETAIL .............................//
   
 

@@ -1,13 +1,13 @@
 #pragma once
 
 //#include "common_header.h"
-#include "level_2/freelist_pool.hpp"
+#include "freelist_pool.hpp"
 
 
 namespace fastl
 {
    template< std::size_t __USER_CHUNK_SIZE,
-	     std::size_t __USER_INIT_N_CHUNK,
+	     std::size_t __USER_INIT_N_CHUNK = 25,
 	     std::size_t __USER_GROW_N_CHUNK = __USER_INIT_N_CHUNK,
 	     typename __ALLOC = fastl :: freelist_pool< __USER_CHUNK_SIZE > >
    class singleton

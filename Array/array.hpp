@@ -16,6 +16,7 @@
  *  Editor      : emacs
  *  Auto Style  : stroustrup
  ** ************************************************************************ */
+
 /** **************************************************************************
  * Copyright (c) 2014 by Rami Younis,
  * Future Reservoir Simulation Systems & Technology (FuRSST)
@@ -35,12 +36,18 @@
  * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  It is
  * provided "as is" without express or implied warranty.
  ** ************************************************************************ */
-#ifndef __ARRAY_HPP_INCLUDED_
-#define __ARRAY_HPP_INCLUDED_
+
+// modified by: Chen Fang
+// date:        02/14/2014
+
+#pragma once
 
 #include <cstddef> // provides size_t ptrdiff_t
-#include "malloc_alloc.hpp"
 #include <iostream>
+
+//#include "malloc_alloc.hpp"
+#include "../memory/memory.h"
+
 
 namespace fastl { // ------------------------------------------ BEGIN NAMESPACE 
 
@@ -50,7 +57,8 @@ namespace fastl { // ------------------------------------------ BEGIN NAMESPACE
     *  Runtime fixed-size heap array container
     **/
    // ----------------------------------------------------------------------- //
-   template< typename __Alloc = fastl::malloc_alloc >
+   template< typename __Alloc = fastl::singleton_pool< 50*sizeof(double),
+						       100, 100 >
    class array
    {
     
@@ -70,28 +78,21 @@ namespace fastl { // ------------------------------------------ BEGIN NAMESPACE
     
    public:
       //.............................  LIFECYCLE  ..........................//
+
       explicit array ();    
-
       explicit array ( size_type _size );
-
       array ( size_type _size, const_reference _elem );
-      
-      // array ( size_type _size, const_iterator __restrict  _itr );
-     
       array ( const this_type & _clone );
-
       array ( array && _other );
-     
       ~array ( );
      
       //...........................  ASSIGNMENT  ..........................//
-     
-      this_type & operator= ( const this_type & _v_rhs );
-    
-      this_type & operator= ( const_reference   _s_rhs );
 
+      this_type & operator= ( const_reference   _s_rhs );
+      this_type & operator= ( const this_type & _v_rhs );
       this_type & operator= ( this_type &&      _v_rhs );
 
+      /* for expression template */
       template< typename __Xpr >
       this_type & operator= ( const __Xpr & _x_rhs );
      
@@ -115,25 +116,19 @@ namespace fastl { // ------------------------------------------ BEGIN NAMESPACE
       //.............................  OPERATORS  .........................//
       void             set_zero ( );
       void             set_value( const_reference _rhs );
-      bool             resize   ( size_type _n );
 
-
-      // private:    
-      // requires non-overlapping buffers
-      // void             copy_from( const_iterator __restrict p_rhs );    
-    
-      // // allows buffers to intersect
-      // void             mv_copy_from( const_iterator p_rhs );
-
-
+      bool             resize         ( size_type _new_size );
+      bool             resize_keep    ( size_type _new_size );
+      bool             resize_discard ( size_type _new_size );
 
    private:
       size_type        N;
       pointer          p_beg;
-   }; // array
+
+   }; /* end of class: array */
   
   
-} // ---------------------------------------------------------- END NAMESPACE
+} /* end of namespace */
 
 #include "array.ipp"
 #include "expression_template/expression.hpp"

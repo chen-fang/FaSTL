@@ -1,5 +1,8 @@
 #pragma once
 
+// created by: Chen Fang
+// 02/14/2016
+
 /* 
  * Level 2 
  * Memory pool based on freelist.
@@ -9,10 +12,19 @@
  *    3) recyclable
  * Cons:
  *    1) pool size cannot be decreased
+ *    2) fix-sized chunks
+ *
+ * Application:
+ * Good for:
+ *    - list
+ *    - chunk size is known at compile time
+ *    - single object allocation
+ * Bad for:
+ *    - vector (size unknown until runtime)
  */
 
 
-#include "../level_1/malloc_alloc.hpp"
+#include "malloc_alloc.hpp"
 
 /* Notations:
  * __USER_CHUNK_SIZE - chunk size selected by the user
