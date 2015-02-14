@@ -2,15 +2,17 @@
 
 /* 
  * Level 2 
- * Memory pool built on coherent_freelist.
+ * Memory pool based on freelist.
+ * Pros:
+ *    1) fast allocation
+ *    2) fast deallocation
+ *    3) recyclable
+ * Cons:
+ *    1) pool size cannot be decreased
  */
 
 
 #include "../level_1/malloc_alloc.hpp"
-
-//#include "../helper/helper.h"
-//#include "../policy/policy.h"
-//#include "../level_1/coherent_freelist.hpp"
 
 /* Notations:
  * __USER_CHUNK_SIZE - chunk size selected by the user
@@ -108,9 +110,11 @@ namespace fastl
       {
 	 if( _alloc_size > chunk_size )
 	 {
-	    std::cout << "### LIBRARY ERROR MESSAGE ###" << std::endl
-		      << "### allocate size > pool chunk size ###" << std::endl
-		      << "### in freelist_pool::allocate( _alloc_size) ###" << std::endl;
+	    std::cout << "### !!! (1/3) LIBRARY RUN-TIME ERROR MESSAGE To USER ....!!! ###" << std::endl
+		      << "### !!! (2/3) in 'freelist_pool::allocate(_alloc_size)' .!!! ###" << std::endl
+		      << "### !!! (3/3) _alloc_size > pool's chunk size ...........!!! ###" << std::endl
+
+		      ;
 	    return nullptr;
 	 }
 	 return allocate();
@@ -128,6 +132,9 @@ namespace fastl
 	    std::cout <<"### deallocate:\t" << _p_dealloc << std::endl;
 	    std::cout <<"### next:\t" << p_second << std::endl << std::endl;
 #endif
+
+	    _p_dealloc = nullptr;
+
 	 }
       }
 
