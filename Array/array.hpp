@@ -46,7 +46,7 @@
 #include <iostream>
 
 //#include "malloc_alloc.hpp"
-#include "../memory/memory.h"
+#include "../Memory/memory.h"
 
 
 namespace fastl { // ------------------------------------------ BEGIN NAMESPACE 
@@ -121,6 +121,11 @@ namespace fastl { // ------------------------------------------ BEGIN NAMESPACE
       bool             resize_keep    ( size_type _new_size );
       bool             resize_discard ( size_type _new_size );
 
+      this_type operator+ ( const this_type & _vec ); // assume both vectors are of the same size
+
+      // debug
+      void print ();
+      
    private:
       size_type        N;
       pointer          p_beg;
@@ -133,7 +138,6 @@ namespace fastl { // ------------------------------------------ BEGIN NAMESPACE
 #include "array.ipp"
 #include "expression_template/expression.hpp"
 
-#endif // __ARRAY_HPP_INCLUDED_
 
 //---------------------------------------------------------------------------//
 //                           EOF array.hpp

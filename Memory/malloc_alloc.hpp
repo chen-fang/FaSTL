@@ -12,7 +12,7 @@
 #include <iostream>  // provides: cout
 #include <cmath>     // provides: log2
 
-#include "../helper/help.h"
+#include "helper/help.h"
 
 namespace fastl
 {

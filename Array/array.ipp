@@ -350,6 +350,33 @@ namespace fastl { // ----------------------------------------- BEGIN NAMESPACE
       }
       return is_successful;
    }
+
+   template< typename __A >
+   inline
+   array<__A>
+   array<__A> :: operator+ ( const array<__A>& _vec )
+   {
+      
+      array<__A> tmp( _vec.size() );
+      for( std::size_t i = 0; i < _vec.size(); ++i )
+      {
+	 tmp[i] = p_beg[i] + _vec[i];
+      }
+      return tmp;
+   }
+
+
+   // debug
+   template< typename __A>
+   inline
+   void array<__A> :: print ()
+   {
+      for( std::size_t i = 0; i < v.size(); ++i )
+      {
+	 std::cout << v[i] << "   ";
+      }
+      std::cout << std::endl;
+   }
    //.............................  DETAIL .............................//
   
 
