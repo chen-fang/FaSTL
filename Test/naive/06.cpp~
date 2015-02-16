@@ -1,0 +1,19 @@
+#include "../../Array/array.hpp"
+
+int main()
+{
+   typedef fastl::array<> array;
+
+   array A0(500,1.1), A1(500,1.1), A2(500,1.1), A3(500,1.1), A4(500,1.1);
+   array A5(500,1.1);
+   array LHS(500);
+   
+   std::size_t REPEAT = 2000000;
+   for( std::size_t j = 0; j < REPEAT; ++j )
+   {
+      LHS = A0 + A1 + A2 + A3 + A4 + A5;
+   }
+
+   LHS.print(10);
+
+}

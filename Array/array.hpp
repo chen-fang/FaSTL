@@ -57,7 +57,7 @@ namespace fastl { // ------------------------------------------ BEGIN NAMESPACE
     *  Runtime fixed-size heap array container
     **/
    // ----------------------------------------------------------------------- //
-   template< typename __Alloc = fastl::singleton< 50*sizeof(double), 100, 100 > >
+   template< typename __Alloc = fastl::singleton< 500*sizeof(double), 100, 100 > >
    class array
    {
     
@@ -89,7 +89,10 @@ namespace fastl { // ------------------------------------------ BEGIN NAMESPACE
 
       this_type & operator= ( const_reference   _s_rhs );
       this_type & operator= ( const this_type & _v_rhs );
+
+      #ifdef RVALUE
       this_type & operator= ( this_type &&      _v_rhs );
+      #endif
 
       /* for expression template */
       template< typename __Xpr >
@@ -124,6 +127,7 @@ namespace fastl { // ------------------------------------------ BEGIN NAMESPACE
 
       // debug
       void print ();
+      void print ( std::size_t first_n );
       
    private:
       size_type        N;

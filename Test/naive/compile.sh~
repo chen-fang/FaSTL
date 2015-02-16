@@ -1,0 +1,4 @@
+for file in '*.cpp'
+do
+    g++ -g -std=c++11 $file -O2 -o ${file%.*}
+done

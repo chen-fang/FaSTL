@@ -65,14 +65,6 @@ namespace fastl { // ----------------------------------------- BEGIN NAMESPACE
       set_value ( _elem );
    }
 
-   // template< typename __A > 
-   // array<__A>::array ( array<__A>::size_type _size,
-   // 		       array<__A>::const_iterator __restrict _itr ) :
-   //    N( _size ), p_beg( static_cast<double *>(__A::allocate( _size*sizeof(double) )) )
-   // { 
-   //    copy_from ( _itr );
-   // }
-
    template< typename __A > 
    array<__A> :: array ( const array<__A> & _clone ) :
       N( _clone.size() ), p_beg( static_cast<double *>(__A::allocate( _clone.size()*sizeof(double) )) )
@@ -126,6 +118,7 @@ namespace fastl { // ----------------------------------------- BEGIN NAMESPACE
       return *this;
    }
 
+   #ifdef RVALUE
    template< typename __A >
    inline
    array<__A> &
@@ -140,6 +133,7 @@ namespace fastl { // ----------------------------------------- BEGIN NAMESPACE
       _v_rhs.p_beg = p_dealloc;
       return *this;
    }
+   #endif
 
    template< typename __A >
    template< typename __Xpr >
@@ -355,7 +349,7 @@ namespace fastl { // ----------------------------------------- BEGIN NAMESPACE
    array<__A>
    array<__A> :: operator+ ( const array<__A>& _vec )
    {
-      
+      // assume same size for now
       array<__A> tmp( _vec.size() );
       for( std::size_t i = 0; i < _vec.size(); ++i )
       {
@@ -370,9 +364,20 @@ namespace fastl { // ----------------------------------------- BEGIN NAMESPACE
    inline
    void array<__A> :: print ()
    {
-      for( std::size_t i = 0; i < v.size(); ++i )
+      for( std::size_t i = 0; i < N; ++i )
       {
-	 std::cout << v[i] << "   ";
+	 std::cout << p_beg[i] << "   ";
+      }
+      std::cout << std::endl;
+   }
+
+   template< typename __A>
+   inline
+   void array<__A> :: print ( std::size_t first_n )
+   {
+      for( std::size_t i = 0; i < first_n; ++i )
+      {
+	 std::cout << p_beg[i] << "   ";
       }
       std::cout << std::endl;
    }
