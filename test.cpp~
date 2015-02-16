@@ -1,0 +1,11 @@
+#include "../Array/array.hpp"
+
+int main()
+{
+   typedef fastl::pool<> ALLOC;
+   ALLOC alloc;
+
+   return -1;
+}
+
+

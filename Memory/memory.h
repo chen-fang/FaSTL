@@ -5,6 +5,7 @@
  * 02/14/2016
 */
 #include "freelist_pool.hpp"
+#include "pool.hpp"
 #include "singleton_pool.hpp"
 
 //#include "malloc_alloc.hpp"

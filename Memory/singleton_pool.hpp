@@ -6,22 +6,22 @@
 
 namespace fastl
 {
-   template< std::size_t __USER_CHUNK_SIZE,
-	     std::size_t __USER_INIT_N_CHUNK = 25,
-	     std::size_t __USER_GROW_N_CHUNK = __USER_INIT_N_CHUNK,
+   template< std::size_t __USER_INIT_PARAM,
+	     std::size_t __USER_GROW_PARAM = __USER_INIT_PARAM,
+	     std::size_t __USER_CHUNK_SIZE = 0,
 	     typename __ALLOC = fastl :: freelist_pool< __USER_CHUNK_SIZE > >
    class singleton
    {
    public:
-      typedef singleton< __USER_CHUNK_SIZE,
-			 __USER_INIT_N_CHUNK,
-			 __USER_GROW_N_CHUNK,
-			 __ALLOC >                   this_type;
-      typedef __ALLOC                                allocator_type;
+      typedef singleton< __USER_INIT_PARAM,
+			 __USER_GROW_PARAM,
+			 __USER_CHUNK_SIZE,
+			 __ALLOC >             this_type;
+      typedef __ALLOC                          allocator_type;
 
       static allocator_type& get_allocator()
       {
-       	 static allocator_type pool( __USER_INIT_N_CHUNK, __USER_GROW_N_CHUNK );
+       	 static allocator_type pool( __USER_INIT_PARAM, __USER_GROW_PARAM );
  	 return pool;
       }
 

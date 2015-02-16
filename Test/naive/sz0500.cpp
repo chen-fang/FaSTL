@@ -4,9 +4,9 @@
 int main()
 {
    const std::size_t N = 500; /* number of elements for each chunk */
-   const std::size_t INIT = L1_CACHE_N / N;
+   const std::size_t INIT = 25;
 
-   typedef fastl::singleton< N*sizeof(double), INIT > ALLOC;
+   typedef fastl::singleton< 500*sizeof(double), INIT > ALLOC;
    typedef fastl::array<ALLOC> array;
    
    array A0(N,1.1), A1(N,1.1), A2(N,1.1), A3(N,1.1), A4(N,1.1);
