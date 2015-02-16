@@ -16,6 +16,9 @@
 
 namespace fastl
 {
+   /* Template parameter <__Tag> is set to provide uniform interface  */
+   template< std::size_t __TAG = 0 >
+   
    struct malloc_alloc
    {
       malloc_alloc ()
@@ -24,7 +27,8 @@ namespace fastl
 	 std::cout << "malloc_alloc()" << std::endl;
 #endif
       }
-      malloc_alloc ( std::size_t _n ) {}
+      malloc_alloc ( std::size_t _init )                    {}
+      malloc_alloc ( std::size_t _init, std::size_t _grow ) {}
 
 
       inline void* allocate( std::size_t _n )

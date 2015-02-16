@@ -50,7 +50,7 @@ void print ( T1 c1, T2 c2 )
 namespace fastl
 {
    template< std::size_t __USER_CHUNK_SIZE,
-	     typename __ALLOC = fastl :: malloc_alloc >
+	     typename __ALLOC = fastl :: malloc_alloc<> >
    class freelist_pool : public __ALLOC
    {
    public:
