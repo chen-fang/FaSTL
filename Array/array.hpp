@@ -57,8 +57,7 @@ namespace fastl { // ------------------------------------------ BEGIN NAMESPACE
     *  Runtime fixed-size heap array container
     **/
    // ----------------------------------------------------------------------- //
-   template< typename __Alloc = fastl::singleton_pool< 50*sizeof(double),
-						       100, 100 >
+   template< typename __Alloc = fastl::singleton< 50*sizeof(double), 100, 100 > >
    class array
    {
     

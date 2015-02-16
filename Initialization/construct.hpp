@@ -31,8 +31,8 @@ namespace fastl
       static inline void destroy        ( T* _p );
       static inline void destroy_buffer ( T* _p_beg, T* _p_end );
 
-      static inline void uninitialized_copy    ( T* _p_dest, T* _src_beg, T* _src_end );
-      static inline void uninitialized_copy_mv ( T* _p_dest, T* _src_beg, T* _src_end );
+      static inline void uninitialized_copy    ( T* _p_dest, const T* _src_beg, const T* _src_end );
+      static inline void uninitialized_copy_mv ( T* _p_dest, const T* _src_beg, const T* _src_end );
    };
 }
 

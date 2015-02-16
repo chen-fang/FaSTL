@@ -161,7 +161,8 @@ namespace fastl
       // ====================================================================== uninitialized_copy()
       // non_trivial
       template< typename T >
-      inline void do_uninitialized_copy ( T* _p_dest, T* _src_beg, T* _src_end, std::false_type )
+      inline void do_uninitialized_copy ( T* _p_dest, const T* _src_beg,
+					  const T* _src_end, std::false_type )
       {
 	 T* dest = _p_dest;
 	 T* p = _src_beg;
@@ -175,10 +176,11 @@ namespace fastl
 
       // trivial
       template< typename T >
-      inline void do_uninitialized_copy ( T* _p_dest, T* _src_beg, T* _src_end, std::true_type )
+      inline void do_uninitialized_copy ( T* _p_dest, const T* _src_beg,
+					  const T* _src_end, std::true_type )
       {
 	 std::memcpy ( static_cast<void*>(_p_dest),
-		       static_cast<void*>(_src_beg),
+		       static_cast<const void*>(_src_beg),
 		       ( _src_end - _src_beg ) * sizeof(T) );
       }
    
@@ -186,7 +188,8 @@ namespace fastl
       // ====================================================================== uninitialized_copy_mv
       // non_trivial
       template< typename T >
-      inline void do_uninitialized_copy_mv ( T* _p_dest, T* _src_beg, T* _src_end, std::false_type )
+      inline void do_uninitialized_copy_mv ( T* _p_dest, const T* _src_beg,
+					     const T* _src_end, std::false_type )
       {
 	 T* dest = _p_dest;
 	 T* p = _src_beg;
@@ -200,10 +203,11 @@ namespace fastl
 
       // trivial
       template< typename T >
-      inline void do_uninitialized_copy_mv ( T* _p_dest, T* _src_beg, T* _src_end, std::true_type )
+      inline void do_uninitialized_copy_mv ( T* _p_dest, const T* _src_beg,
+					     const T* _src_end, std::true_type )
       {
 	 std::memmove ( static_cast<void*>(_p_dest),
-			static_cast<void*>(_src_beg),
+			static_cast<const void*>(_src_beg),
 			( _src_end - _src_beg ) * sizeof(T) );
       }
 

@@ -39,7 +39,7 @@
 #define __ARRAY_IPP_INCLUDED_
 
 #include "array.hpp"
-#include "initialization/construct.hpp"
+#include "../Initialization/construct.hpp"
 
 
 namespace fastl { // ----------------------------------------- BEGIN NAMESPACE 
@@ -79,7 +79,7 @@ namespace fastl { // ----------------------------------------- BEGIN NAMESPACE
    { 
       //copy_from ( _clone );
       typedef array<__A>:: value_type T;
-      fastl::CTR<double>:: uninitialized_copy( p_beg, _clone.p_beg, _clone.p_beg+N );
+      fastl::CTR<T>:: uninitialized_copy( p_beg, _clone.p_beg, _clone.p_beg+N );
    }
 
    template< typename __A >
@@ -118,14 +118,11 @@ namespace fastl { // ----------------------------------------- BEGIN NAMESPACE
        */
       typedef array<__A>::value_type   T;
 
-      if( p_beg == _v_rhs.begin )
+      if( p_beg == _v_rhs.begin() )
 	 return *this;
 
-      if ( N < _v_rhs.size() )
-      {
-	 resize( _v_rhs.size() );
-      }
-      fastl::CTR<T>:: uninitialized_copy( p_beg, _v_rhs.beg(), _v_rhs.end() );
+      resize( _v_rhs.size() );
+      fastl::CTR<T>:: uninitialized_copy( p_beg, _v_rhs.begin(), _v_rhs.end() );
       return *this;
    }
 
@@ -140,7 +137,7 @@ namespace fastl { // ----------------------------------------- BEGIN NAMESPACE
       N = _v_rhs.N;
       p_beg = _v_rhs.p_beg;
 
-      _v_rhs.p_beg = doom;
+      _v_rhs.p_beg = p_dealloc;
       return *this;
    }
 
@@ -297,14 +294,15 @@ namespace fastl { // ----------------------------------------- BEGIN NAMESPACE
    bool array<__A> :: resize_keep( array<__A>::size_type _new_size )
    {
       /* keep contents after resize */
-      if(  N < _new_size )      N = _new_size;
+      bool is_successful = true;
+      if(  N > _new_size )      N = _new_size;
       else
       {
 	 typedef array<__A>::pointer      pointer;
 	 typedef array<__A>::value_type   T;
 
 	 pointer p_new = static_cast<pointer>( __A::allocate( _new_size * sizeof(T) ) );
-	 bool is_successful = true;
+
 	 if( p_new != nullptr )
 	 {
 	    fastl::CTR<T>::set_zero( p_new, p_new+_new_size );
@@ -329,13 +327,14 @@ namespace fastl { // ----------------------------------------- BEGIN NAMESPACE
    bool array<__A> :: resize_discard ( array<__A>::size_type _new_size )
    {
       /* discard contents after resize */
-      if(  N < _new_size )      N = _new_size;
+      bool is_successful = true;
+      if(  N > _new_size )      N = _new_size;
       else
       {
 	 typedef array<__A>::pointer      pointer;
 	 typedef array<__A>::value_type   T;
 	 pointer p_new = static_cast<pointer>( __A::allocate( _new_size * sizeof(T) ) );
-	 bool is_successful = true;
+
 	 if( p_new != nullptr )
 	 {
 	    pointer p_dealloc = p_beg;
