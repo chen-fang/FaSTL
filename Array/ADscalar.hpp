@@ -32,7 +32,7 @@ public:
    void print ()
    {
       std::cout << m_value << std::endl;
-      for( std::size_t i = 0; i < 6; ++i )
+      for( std::size_t i = 0; i < 10; ++i )
 	 std::cout << m_gradient[i] << "   ";
       std::cout << std::endl << std::endl;
    }

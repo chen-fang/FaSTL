@@ -46,7 +46,7 @@
 #include <iostream>
 
 //#include "malloc_alloc.hpp"
-#include "../memory/memory.h"
+#include "../Memory/memory.h"
 
 
 namespace fastl { // ------------------------------------------ BEGIN NAMESPACE 
@@ -57,8 +57,7 @@ namespace fastl { // ------------------------------------------ BEGIN NAMESPACE
     *  Runtime fixed-size heap array container
     **/
    // ----------------------------------------------------------------------- //
-   template< typename __Alloc = fastl::singleton_pool< 50*sizeof(double),
-						       100, 100 >
+   template< typename __Alloc = fastl::singleton< 50*sizeof(double), 100, 100 > >
    class array
    {
     
@@ -133,7 +132,6 @@ namespace fastl { // ------------------------------------------ BEGIN NAMESPACE
 #include "array.ipp"
 #include "expression_template/expression.hpp"
 
-#endif // __ARRAY_HPP_INCLUDED_
 
 //---------------------------------------------------------------------------//
 //                           EOF array.hpp

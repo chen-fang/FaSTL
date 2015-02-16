@@ -98,14 +98,14 @@ namespace fastl
 
    template< typename T >
    inline
-   void CTR<T> :: uninitialized_copy ( T* _p_dest, T* _src_beg, T* _src_end )
+   void CTR<T> :: uninitialized_copy ( T* _p_dest, const T* _src_beg, const T* _src_end )
    {
       fastl :: impl :: do_uninitialized_copy( _p_dest, _src_beg, _src_end, std::is_trivial<T>() );
    }
 
    template< typename T >
    inline
-   void CTR<T> :: uninitialized_copy_mv ( T* _p_dest, T* _src_beg, T* _src_end )
+   void CTR<T> :: uninitialized_copy_mv ( T* _p_dest, const T* _src_beg, const T* _src_end )
    {
       fastl :: impl :: do_uninitialized_copy_mv( _p_dest, _src_beg, _src_end, std::is_trivial<T>() );
    }
