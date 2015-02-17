@@ -60,6 +60,7 @@ namespace fastl
       void initialize()
       {
 	 p_entry = nullptr;
+	 p_entry_char = nullptr;
 	 n_entry = 0;
       }
 
@@ -73,21 +74,24 @@ namespace fastl
 	    std::cout << "Before update:" << std::endl;
 	    print();
 #endif
-	    char** p_dealloc = p_entry;
-	    p_entry = static_cast<char**>( __ALLOC :: allocate( N * sizeof(void*) ) );
+	    void** p_dealloc = p_entry;
+	    char** p_dealloc_char = static_cast<char**>( static_cast<void*>(p_dealloc) );
+	    
+	    p_entry = static_cast<void**>( __ALLOC :: allocate( N * STD_SIZEOF_POINTER ) );
+	    p_entry_char = static_cast<char**>( static_cast<void*>(p_entry) );
 
 	    std::size_t i = 0;
 	    for( ; i < n_entry; ++i )
 	    {
-	       p_entry[i] = p_dealloc[i];
+	       p_entry_char[i] = p_dealloc_char[i];
 	    }
 	    for( ; i < N; ++i )
 	    {
-	       p_entry[i] = nullptr;
+	       p_entry_char[i] = nullptr;
 	    }
 
 	    n_entry = N;
-	    __ALLOC :: deallocate( static_cast<void*>(p_dealloc) );
+	    __ALLOC :: deallocate( p_dealloc );
 
 #ifdef DUMP_POOL
 	    std::cout << "After update:" << std::endl;
@@ -99,22 +103,22 @@ namespace fastl
       void print()
       {
 	 std::cout << "### Recycle Manager Size:  " << n_entry << std::endl;
-	 std::cout << "### Recycle Manager Entry: " << (void*)p_entry << std::endl;
+	 std::cout << "### Recycle Manager Entry: " << p_entry << std::endl;
 	 for( std::size_t i = 0 ; i < n_entry; ++i )
 	 {
-	    std::cout << "### " << i << " --- " << (void*)p_entry[i] << std::endl;
+	    std::cout << "### " << i << " --- " << (void*)p_entry_char[i] << std::endl;
 	 }
 	 std::cout << std::endl;
       }	    
 
-      void* operator[] ( std::size_t i )
+      void*& operator[] ( std::size_t i )
       {
-	 return static_cast<void*>( p_entry + sizeof(char*) );
+	 return *static_cast<void**>( static_cast<void*>( p_entry_char + i ) );
       }
 
-      void* operator[] ( std::size_t i ) const
+      void*& operator[] ( std::size_t i ) const
       {
-	 return static_cast<void*>( p_entry + sizeof(char*) );
+	 return *static_cast<void**>( static_cast<void*>( p_entry_char + i ) );
       }
 
       void*& nextof( void* _p )
@@ -132,7 +136,8 @@ namespace fastl
 
 
    private:	       
-      char**      p_entry;
+      void**      p_entry;
+      char**      p_entry_char;
       std::size_t n_entry;
    };
       
@@ -155,7 +160,7 @@ namespace fastl
 	   p_available_pool(nullptr), remaining_memory_size(0)
       {
 #ifdef DUMP_POOL
-	 std::cout << "pool()" << std::endl;
+	 std::cout << "pool( _init_size )" << std::endl;
 #endif
 	 recycle.initialize();
 	 expand( _init_size );
@@ -194,7 +199,9 @@ namespace fastl
       void* allocate ( std::size_t _alloc_size )
       {
 	 std::size_t P = std::log2(_alloc_size);
-	 if( p_available_pool == nullptr && recycle[P] == nullptr )
+	 std::size_t alloc_sz = _alloc_size + STD_SIZEOF_SIZE_T;
+	 
+	 if( remaining_memory_pool < alloc_sz && recycle[P] == nullptr )
 	 {
 #ifdef DUMP_POOL
 	    std::cout << "!!! Not enouth space: expand !!!" << std::endl;
@@ -204,25 +211,53 @@ namespace fastl
 	 }
 
 	 void* p_alloc_head;
-	 std::size_t s = sizeof( std::size_t );
-	 if( remaining_memory_size >= _alloc_size + s )
+	 char* p_alloc_head_char;
+
+	 if( remaining_memory_size >= alloc_sz )
 	 {
 	    p_alloc_head = p_available_pool;
-	    remaining_memory_size -= ( _alloc_size + s );
+	    p_alloc_head_char = static_cast<char*>( p_alloc_head );
+	    p_available_pool = static_cast<char*>(static_cast<char*>(p_available_pool) + alloc_sz);
+	    remaining_memory_size -= alloc_sz;
+	    
+#ifdef DUMP_POOL
+	    std::cout << "allocate from pool..." << std::endl;
+	    std::cout << "### alloc_sz:\t" << alloc_sz << std::endl;
+	    std::cout << "### p_alloc_head:\t" << p_alloc_head << std::endl;
+	    std::cout << "### p_availale_pool:\t" << p_available_pool << std::endl;
+#endif
+
+	    Input_Size_Info( p_alloc_head, _alloc_size );
+	    return static_cast<void*>( p_alloc_head_char + STD_SIZEOF_SIZE_T );
 	 }
-	 else
+	 
+	 if( recycle[P] != nullptr )
 	 {
+#ifdef DUMP_POOL
+	    std::cout << "allocate from recycle..." << std::endl;
+#endif	    	    
 	    p_alloc_head = recycle[P];
 	    recycle[P] = recycle.nextof( recycle[P] );
+
+	    Input_Size_Info( p_alloc_head, _alloc_size );
+	    return static_cast<void*>( p_alloc_head_char + STD_SIZEOF_SIZE_T );	    
 	 }
-	 Input_Size_Info( p_alloc_head, _alloc_size );
 
 	 
 #ifdef DUMP_POOL
-	 std::cout << "### allocate:\t" << p_ret << std::endl;
-	 std::cout << "### next:\t" << p_available << std::endl << std::endl;
+	 std::cout << "!!! Not enouth space: expand !!!" << std::endl;
 #endif
-	 return static_cast<void*>( static_cast<char*>(p_alloc_head) + s );
+	    
+	 expand( GrowSZ );
+	 
+	 return allocate(
+
+
+#ifdef DUMP_POOL
+	 std::cout << "### input size:\t" << *((std::size_t*)p_alloc_head) << std::endl;
+#endif	    	    	 
+
+	 return static_cast<void*>( p_alloc_head_char + STD_SIZEOF_SIZE_T );
       }
 
 
@@ -267,8 +302,8 @@ namespace fastl
 	 std::cout << "MemBlock:   " << p_mb_head << " --- --- > "
 		   << (void*)( (char*)p_mb_head + mb_sz ) << std::endl;
 
-	 std::cout << "Buffer:     " << p_available << " --- --- > "
-		   << (void*)( (char*)p_available + _num_chunk * chunk_size ) << std::endl;
+	 std::cout << "Buffer:     " << p_available_pool << " --- --- > "
+		   << (void*)( (char*)p_available_pool + _mb_sz ) << std::endl;
 
 	 std::cout << "------------------------------------------" << std::endl;
 #endif

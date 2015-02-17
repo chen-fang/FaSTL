@@ -7,7 +7,12 @@
 int main()
 {
    typedef fastl::Pool<> ALLOC;
-   ALLOC alloc(32);
+   ALLOC alloc(64);
+
+   void* p;
+   p = alloc.allocate(16);
+   p = alloc.allocate(16);
+   //p = alloc.allocate(16);
 
 
    // fastl::RecycleManager<> R;
