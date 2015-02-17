@@ -200,67 +200,35 @@ namespace fastl
 
       void* allocate ( std::size_t _alloc_size )
       {
-	 std::size_t P = std::log2(_alloc_size);
-	 std::size_t alloc_sz = _alloc_size + STD_SIZEOF_SIZE_T + STD_SIZEOF_POINTER;
+
+	 std::size_t buffer_sz = AllocSize( _alloc_size );
+	 std::size_t P = std::log2( buffer_sz );
+	 std::size_t request_sz = buffer_sz + STD_SIZEOF_SIZE_T + STD_SIZEOF_POINTER;
+
+	 void* p_alloc_head;
+
+	 if( remaining_memory_size >= request_sz )
+	 {
+	    p_alloc_head = allocate_from_pool( request_sz );
+	 }
 	 
-	 if( remaining_memory_pool < alloc_sz && recycle[P] == nullptr )
+	 else if( recycle[P] != nullptr )
+	 {
+	    p_alloc_head = allocate_from_recycle( P );
+	 }
+
+	 else
 	 {
 #ifdef DUMP_POOL
 	    std::cout << "!!! Not enouth space: expand !!!" << std::endl;
 #endif
-	    
 	    expand( GrowSZ );
-	 }
-
-	 void* p_alloc_head;
-
-	 if( remaining_memory_size >= alloc_sz )
-	 {
-	    p_alloc_head = p_available_pool;
-	    p_alloc_head_char = static_cast<char*>( p_alloc_head );
-	    p_available_pool = static_cast<char*>(static_cast<char*>(p_available_pool) + alloc_sz);
-	    remaining_memory_size -= alloc_sz;
-	    
-#ifdef DUMP_POOL
-	    std::cout << "allocate from pool..." << std::endl;
-	    std::cout << "### alloc_sz:\t" << alloc_sz << std::endl;
-	    std::cout << "### p_alloc_head:\t" << p_alloc_head << std::endl;
-	    std::cout << "### p_availale_pool:\t" << p_available_pool << std::endl;
-#endif
-
-	    void* pSize = Determine_pSize( p_alloc_head );
-	    *static_cast<size_type*>(pSize) = alloc_sz;
-	    return Determine_pBuffer( p_alloc_head );
+	    p_alloc_head = allocate( _alloc_size );
 	 }
 	 
-	 if( recycle[P] != nullptr )
-	 {
-#ifdef DUMP_POOL
-	    std::cout << "allocate from recycle..." << std::endl;
-#endif	    	    
-	    p_alloc_head = recycle[P];
-	    recycle[P] = recycle.nextof( recycle[P] );
-
-	     void* pSize = Determine_pSize( p_alloc_head );
-	    *static_cast<size_type*>(pSize) = alloc_sz;
-	    return Determine_pBuffer( p_alloc_head );
-	 }
-
-	 
-#ifdef DUMP_POOL
-	 std::cout << "!!! Not enouth space: expand !!!" << std::endl;
-#endif
-	    
-	 expand( GrowSZ );
-	 
-	 return allocate(
-
-
-#ifdef DUMP_POOL
-	 std::cout << "### input size:\t" << *((std::size_t*)p_alloc_head) << std::endl;
-#endif	    	    	 
-
-	 return static_cast<void*>( p_alloc_head_char + STD_SIZEOF_SIZE_T );
+	 void* pSize = Determine_pSize( p_alloc_head );
+	 *static_cast<size_type*>(pSize) = buffer_sz;
+	 return Determine_pBegin( p_alloc_head );	
       }
 
 
@@ -334,6 +302,22 @@ namespace fastl
 	 return sizeof( MemBlock_List );
       }
 
+      std::size_t AllocSize ( std::size_t _alloc_sz )
+      {
+	 std::size_t ret_sz;
+
+	 if( _alloc_sz < 16 )
+	 {
+	    ret_sz = 16;
+	 }
+	 else
+	 {
+	    int N = std::log2( _alloc_sz - 1 );
+	    ret_sz = 1 << (N+1);
+	 }
+	 return ret_sz;
+      }
+
       
       /*
        * functions for buffer information
@@ -359,10 +343,42 @@ namespace fastl
 	 return static_cast<void*>( static_cast<char*>(_p_head) + STD_SIZEOF_POINTER );
       }
 
-      void* Determine_pBuffer ( void* _p_head )
+      void* Determine_pBegin ( void* _p_head )
       {
 	 return static_cast<void*>( static_cast<char*>(_p_head) +
 				    STD_SIZEOF_POINTER + STD_SIZEOF_SIZE_T );
+      }
+
+      /* 
+       * Auxillary Functions
+       */
+      void* allocate_from_pool ( std::size_t _alloc_size )
+      {
+	 void* p_alloc_head;
+	 p_alloc_head = p_available_pool;
+	 p_available_pool = static_cast<char*>(static_cast<char*>(p_available_pool) + request_sz);
+	 remaining_memory_size -= request_sz;
+	    
+#ifdef DUMP_POOL
+	 std::cout << "allocate from pool..." << std::endl;
+	 std::cout << "### alloc_sz:\t" << alloc_sz << std::endl;
+	 std::cout << "### p_alloc_head:\t" << p_alloc_head << std::endl;
+	 std::cout << "### p_availale_pool:\t" << p_available_pool << std::endl;
+#endif
+	 return p_alloc_head;
+      }
+
+      void* allocate_from_recycle ( std::size_t _P )
+      {
+#ifdef DUMP_POOL
+	 std::cout << "allocate from recycle..." << std::endl;
+#endif	    	    
+
+	 void* p_alloc_head;
+	 p_alloc_head = recycle[P];
+	 recycle[P] = recycle.nextof( recycle[P] );
+
+	 return p_alloc_head;
       }
 
    private:
