@@ -155,6 +155,8 @@ namespace fastl
    class Pool : public __ALLOC
    {
    public:
+      typedef std::size_t size_type;
+      
       Pool ( std::size_t _init_size )
 	 : GrowSZ(_init_size), MemBlock_List(nullptr),
 	   p_available_pool(nullptr), remaining_memory_size(0)
@@ -199,7 +201,7 @@ namespace fastl
       void* allocate ( std::size_t _alloc_size )
       {
 	 std::size_t P = std::log2(_alloc_size);
-	 std::size_t alloc_sz = _alloc_size + STD_SIZEOF_SIZE_T;
+	 std::size_t alloc_sz = _alloc_size + STD_SIZEOF_SIZE_T + STD_SIZEOF_POINTER;
 	 
 	 if( remaining_memory_pool < alloc_sz && recycle[P] == nullptr )
 	 {
@@ -211,7 +213,6 @@ namespace fastl
 	 }
 
 	 void* p_alloc_head;
-	 char* p_alloc_head_char;
 
 	 if( remaining_memory_size >= alloc_sz )
 	 {
@@ -227,8 +228,9 @@ namespace fastl
 	    std::cout << "### p_availale_pool:\t" << p_available_pool << std::endl;
 #endif
 
-	    Input_Size_Info( p_alloc_head, _alloc_size );
-	    return static_cast<void*>( p_alloc_head_char + STD_SIZEOF_SIZE_T );
+	    void* pSize = Determine_pSize( p_alloc_head );
+	    *static_cast<size_type*>(pSize) = alloc_sz;
+	    return Determine_pBuffer( p_alloc_head );
 	 }
 	 
 	 if( recycle[P] != nullptr )
@@ -239,8 +241,9 @@ namespace fastl
 	    p_alloc_head = recycle[P];
 	    recycle[P] = recycle.nextof( recycle[P] );
 
-	    Input_Size_Info( p_alloc_head, _alloc_size );
-	    return static_cast<void*>( p_alloc_head_char + STD_SIZEOF_SIZE_T );	    
+	     void* pSize = Determine_pSize( p_alloc_head );
+	    *static_cast<size_type*>(pSize) = alloc_sz;
+	    return Determine_pBuffer( p_alloc_head );
 	 }
 
 	 
@@ -320,23 +323,6 @@ namespace fastl
 	 }
       }
 
-      void Input_Size_Info ( void* _p_alloc, std::size_t _alloc_size )
-      {
-	 typedef std::size_t size_type;
-	 *static_cast<size_type*>(_p_alloc) = _alloc_size;
-      }
-
-      void* Recover_Head_Ptr ( void* _p_buffer )
-      {
-	 return static_cast<void*>( static_cast<char*>(_p_buffer) - STD_SIZEOF_SIZE_T  );
-      }
-
-      std::size_t Read_Size_Info ( void* _p_buffer )
-      {
-	 typedef std::size_t size_type;
-	 void* p_head = Recover_Head_Ptr( _p_buffer );
-	 return *static_cast<size_type*>( p_head );
-      }
 
       static void*& nextof( void* _p )
       {
@@ -348,6 +334,36 @@ namespace fastl
 	 return sizeof( MemBlock_List );
       }
 
+      
+      /*
+       * functions for buffer information
+       */
+      void* Recover_pHead ( void* _p_begin )
+      {
+	 return static_cast<void*>( static_cast<char*>(_p_begin) -
+				    STD_SIZEOF_SIZE_T - STD_SIZEOF_POINTER  );
+      }
+
+      void* Recover_pSize ( void* _p_begin )
+      {
+	 return static_cast<void*>( static_cast<char*>(_p_begin) - STD_SIZEOF_SIZE_T );
+      }
+
+      void* Determine_pNext ( void* _p_head )
+      {
+	 return _p_head;
+      }
+
+      void* Determine_pSize ( void* _p_head )
+      {
+	 return static_cast<void*>( static_cast<char*>(_p_head) + STD_SIZEOF_POINTER );
+      }
+
+      void* Determine_pBuffer ( void* _p_head )
+      {
+	 return static_cast<void*>( static_cast<char*>(_p_head) +
+				    STD_SIZEOF_POINTER + STD_SIZEOF_SIZE_T );
+      }
 
    private:
       std::size_t       GrowSZ;
