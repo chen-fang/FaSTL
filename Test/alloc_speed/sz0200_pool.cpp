@@ -3,17 +3,16 @@
 
 int main()
 {
-   const std::size_t N = 200; /* number of elements for each chunk */
-   const std::size_t INIT = 25;
+   const std::size_t N = 10; /* number of elements for each chunk */
 
-   typedef fastl::singleton< N*sizeof(double), INIT > POOL;
+   typedef fastl::singleton< 30*sizeof(double) > POOL;
    typedef fastl::array<POOL> array;
    
    array A0(N,1.1), A1(N,1.1), A2(N,1.1), A3(N,1.1), A4(N,1.1);
    array A5(N,1.1), A6(N,1.1), A7(N,1.1), A8(N,1.1), A9(N,1.1);
    array LHS(N);
    
-   std::size_t REPEAT = 1E+07;
+   std::size_t REPEAT = 1;//1E+07;
    for( std::size_t j = 0; j < REPEAT; ++j )
    {
       LHS = A0 + A1 + A2 + A3 + A4 + A5 + A6 + A7 + A8 + A9;
