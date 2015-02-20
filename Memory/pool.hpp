@@ -106,7 +106,14 @@ namespace fastl
 	 std::cout << "### Recycle Manager Entry: " << p_entry << std::endl;
 	 for( std::size_t i = 0 ; i < n_entry; ++i )
 	 {
-	    std::cout << "### " << i << " --- " << (void*)p_entry_char[i] << std::endl;
+	    void* p_run = static_cast<void*>( p_entry_char[i] );
+	    std::cout << "### " << i << " --- " << p_run;
+	    while( p_run != nullptr )
+	    {
+	       p_run = this->nextof( p_run );
+	       std::cout << " --- " << p_run;
+	    }
+	    std::cout << std::endl;
 	 }
 	 std::cout << std::endl;
       }	    
@@ -126,11 +133,19 @@ namespace fastl
 	 return *(static_cast<void**>( _p ));
       }
 
+      std::size_t size()
+      {
+	 return n_entry;
+      }
+
    public:
       //private:
       RecycleManager()  { /* ctor is disabled */ }
       ~RecycleManager()
       {
+#ifdef DUMP_POOL
+	 std::cout << "~RecycleManager: " << (void*)p_entry << std::endl;
+#endif
 	 __ALLOC :: deallocate( static_cast<void*>(p_entry) );
       }
 
@@ -212,7 +227,8 @@ namespace fastl
 	    p_alloc_head = allocate_from_pool( request_sz );
 	 }
 	 
-	 else if( recycle[P] != nullptr )
+
+	 else if( (P+1) <= recycle.size() && recycle[P] != nullptr )
 	 {
 	    p_alloc_head = allocate_from_recycle( P );
 	 }
@@ -222,8 +238,16 @@ namespace fastl
 #ifdef DUMP_POOL
 	    std::cout << "!!! Not enouth space: expand !!!" << std::endl;
 #endif
-	    expand( GrowSZ );
-	    p_alloc_head = allocate( _alloc_size );
+	    bool is_successful = expand( GrowSZ );
+	    if( is_successful == true )
+	    {
+	       GrowSZ *= 2;
+	       p_alloc_head = allocate( _alloc_size );
+	    }
+	    else
+	    {
+	       p_alloc_head = nullptr; /* other strategies may apply */
+	    }
 	 }
 	 
 	 void* pSize = Determine_pSize( p_alloc_head );
@@ -236,18 +260,20 @@ namespace fastl
       {
 	 if( _p_dealloc != nullptr )
 	 {
-	    std::size_t P = std::log2( Read_Size_Info(_p_dealloc) );
+	    void* p_head_dealloc = Recover_pHead( _p_dealloc );
+	    std::size_t P = std::log2( *static_cast<size_type*>( Recover_pSize(_p_dealloc)) );
 	    void* p_second = recycle[P];
-	    recycle[P] = _p_dealloc;
+	    recycle[P] = p_head_dealloc;
 	    nextof( recycle[P] ) = p_second;
 
 #ifdef DUMP_POOL
-	    std::cout <<"### deallocate:\t" << _p_dealloc << std::endl;
-	    std::cout <<"### next:\t" << p_second << std::endl << std::endl;
+	    std::cout <<"deallocate:" << std::endl;
+	    std::cout <<"*** deallocate:\t" << Recover_pHead(_p_dealloc) << std::endl;
+	    std::cout <<"*** next:\t" << p_second << std::endl << std::endl;
+	    recycle.print();
 #endif
 
 	    _p_dealloc = nullptr;
-
 	 }
       }
 
@@ -352,18 +378,22 @@ namespace fastl
       /* 
        * Auxillary Functions
        */
-      void* allocate_from_pool ( std::size_t _alloc_size )
+      void* allocate_from_pool ( std::size_t _request_sz )
       {
+#ifdef DUMP_POOL
+	 std::cout << "-------- allocate from pool ----------" << std::endl;
+#endif
+
 	 void* p_alloc_head;
 	 p_alloc_head = p_available_pool;
-	 p_available_pool = static_cast<char*>(static_cast<char*>(p_available_pool) + request_sz);
-	 remaining_memory_size -= request_sz;
+	 p_available_pool = static_cast<char*>(static_cast<char*>(p_available_pool) + _request_sz);
+	 remaining_memory_size -= _request_sz;
 	    
 #ifdef DUMP_POOL
-	 std::cout << "allocate from pool..." << std::endl;
-	 std::cout << "### alloc_sz:\t" << alloc_sz << std::endl;
+	 std::cout << "### request_sz:\t" << _request_sz << std::endl;
 	 std::cout << "### p_alloc_head:\t" << p_alloc_head << std::endl;
 	 std::cout << "### p_availale_pool:\t" << p_available_pool << std::endl;
+	 std::cout << "--------------------------------------" << std::endl;
 #endif
 	 return p_alloc_head;
       }
@@ -371,12 +401,19 @@ namespace fastl
       void* allocate_from_recycle ( std::size_t _P )
       {
 #ifdef DUMP_POOL
-	 std::cout << "allocate from recycle..." << std::endl;
-#endif	    	    
+	 std::cout << "-------- allocate from recycle ----------" << std::endl;
+#endif
 
 	 void* p_alloc_head;
-	 p_alloc_head = recycle[P];
-	 recycle[P] = recycle.nextof( recycle[P] );
+	 p_alloc_head = recycle[_P];
+	 recycle[_P] = recycle.nextof( recycle[_P] );
+
+#ifdef DUMP_POOL
+	 std::cout << "### p_alloc_head:\t" << p_alloc_head << std::endl;
+	 std::cout << "recycle info:" << std::endl;
+	 recycle.print();
+	 std::cout << "-----------------------------------------" << std::endl;
+#endif	    	    
 
 	 return p_alloc_head;
       }

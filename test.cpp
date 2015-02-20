@@ -8,10 +8,22 @@ int main()
 {
    typedef fastl::Pool<> ALLOC;
    ALLOC alloc(64);
-
    void* p;
    p = alloc.allocate(16);
+   alloc.deallocate( p );
+
    p = alloc.allocate(16);
+   alloc.deallocate( p );
+
+   p = alloc.allocate(32);
+   alloc.deallocate( p );
+
+   p = alloc.allocate(32);
+   alloc.deallocate( p );
+   p = alloc.allocate(64);
+   alloc.deallocate( p );
+
+
    //p = alloc.allocate(16);
 
 
