@@ -344,16 +344,14 @@ namespace fastl { // ----------------------------------------- BEGIN NAMESPACE
       return is_successful;
    }
 
-   template< typename __A >
-   inline
-   array<__A>
-   array<__A> :: operator+ ( const array<__A>& _vec )
+   template< typename __a >
+   array<__a> operator+ ( const array<__a>& _vec1, const array<__a>& _vec2 )
    {
       // assume same size for now
-      array<__A> tmp( _vec.size() );
-      for( std::size_t i = 0; i < _vec.size(); ++i )
+      array<__a> tmp( _vec1.size() );
+      for( std::size_t i = 0; i < _vec1.size(); ++i )
       {
-	 tmp[i] = p_beg[i] + _vec[i];
+	 tmp[i] = _vec1[i] + _vec2[i];
       }
       return tmp;
    }

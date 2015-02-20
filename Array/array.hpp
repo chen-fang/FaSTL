@@ -57,8 +57,8 @@ namespace fastl { // ------------------------------------------ BEGIN NAMESPACE
     *  Runtime fixed-size heap array container
     **/
    // ----------------------------------------------------------------------- //
-   template< typename __Alloc = 
-	     fastl::singleton< 100, 100, 500*sizeof(double) > >
+   template< typename __Alloc = fastl::malloc_alloc<> >
+	     //fastl::singleton< 100, 100, 500*sizeof(double) > >
    class array
    {
     
@@ -124,7 +124,10 @@ namespace fastl { // ------------------------------------------ BEGIN NAMESPACE
       bool             resize_keep    ( size_type _new_size );
       bool             resize_discard ( size_type _new_size );
 
-      this_type operator+ ( const this_type & _vec ); // assume both vectors are of the same size
+
+      // assume both vectors are of the same size FOR NOW
+      template< typename __a >
+      friend array<__a> operator+ ( const array<__a>& _vec1, const array<__a> & _vec2 ); 
 
       // debug
       void print ();
