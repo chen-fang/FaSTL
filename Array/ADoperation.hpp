@@ -16,19 +16,20 @@ class ADscalarX;
  * 3) ADscalarX<X>
  */
 
+#ifdef RESTRICT //-------------------------------------------- begin
 template< typename Left, typename Right >
 inline
 ADscalarX< typename ADtraits< Left, Right, OpAdd > :: xpr_type >
-operator+ ( const Left& _left, const Right& _right )
+operator+ ( const Left& __restrict _left, const Right& __restrict _right )
 {
    typedef typename ADtraits< Left, Right, OpAdd >::xpr_type       Xpr_T;
 
-#ifndef ET_TEST
-   return ADscalarX<Xpr_T>( _left.value() + _right.value(),
-   			    Xpr_T( _left.gradient(),
-   				   _right.gradient() ) );
+// #ifndef ET_TEST
+//    return ADscalarX<Xpr_T>( _left.value() + _right.value(),
+//    			    Xpr_T( _left.gradient(),
+//    				   _right.gradient() ) );
    
-#else
+// #else
    /*
     * For the purpose of looking into expression itself, value operations are
     * bypassed temporarily
@@ -36,9 +37,24 @@ operator+ ( const Left& _left, const Right& _right )
    return ADscalarX<Xpr_T>( 0,
 			    Xpr_T( _left.gradient(),
 				   _right.gradient() ) );
-#endif
+//#endif
 }
 
+#else //------------------------------------------------------- continue
+template< typename Left, typename Right >
+inline
+ADscalarX< typename ADtraits< Left, Right, OpAdd > :: xpr_type >
+operator+ ( const Left& _left, const Right& _right )
+{
+   typedef typename ADtraits< Left, Right, OpAdd >::xpr_type       Xpr_T;
+
+   return ADscalarX<Xpr_T>( 0,
+			    Xpr_T( _left.gradient(),
+				   _right.gradient() ) );
+
+}
+#endif
+// ---------------------------------------------------------------- end
 
 template< typename Left, typename Right >
 inline

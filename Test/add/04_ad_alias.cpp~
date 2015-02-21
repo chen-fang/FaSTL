@@ -1,4 +1,4 @@
-#include "../../Array/ADscalar.hpp"
+#include "../ADscalar.hpp"
 
 // print array
 template< typename A >

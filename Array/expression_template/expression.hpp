@@ -126,6 +126,29 @@
 // ==============================================================
 
 // ============================================================== V + W
+#ifdef RESTRICT
+template< typename Left, typename Right >
+class V_p_W
+{
+public:
+   typedef typename array_type::value_type             value_type;
+   typedef double                                      S_type;
+   typedef typename traits< Left >::type               V_type;
+   typedef typename traits< Right >::type              W_type;
+
+   V_p_W ( const Left& __restrict _v, const Right& __restrict _w ) : V(_v), W(_w)
+   {}
+
+   inline value_type operator [] ( std::size_t i )            { return V[i] + W[i]; }
+   inline value_type operator [] ( std::size_t i ) const      { return V[i] + W[i]; }
+   inline std::size_t size () const                           { return V.size();  }
+
+private:
+   V_type V;
+   W_type W;
+};
+
+#else
 template< typename Left, typename Right >
 class V_p_W
 {
@@ -136,14 +159,7 @@ public:
    typedef typename traits< Right >::type              W_type;
 
    V_p_W ( const Left& _v, const Right& _w ) : V(_v), W(_w)
-   {
-#ifdef DUMP
-      std::cout << "V_p_W" << std::endl;
-      traits<Left>();
-      traits<Right>();
-#endif
-   }
-
+   {}
 
    inline value_type operator [] ( std::size_t i )            { return V[i] + W[i]; }
    inline value_type operator [] ( std::size_t i ) const      { return V[i] + W[i]; }
@@ -153,6 +169,8 @@ private:
    V_type V;
    W_type W;
 };
+
+#endif
 
 // ============================================================== V - W
 template< typename Left, typename Right >

@@ -10,7 +10,8 @@ namespace fastl
    template< std::size_t __USER_INIT_PARAM,
 	     std::size_t __USER_GROW_PARAM = __USER_INIT_PARAM,
 	     std::size_t __USER_CHUNK_SIZE = 0,
-	     typename __ALLOC = fastl :: Pool< __USER_CHUNK_SIZE > >
+	     typename __ALLOC = fastl::freelist_pool< __USER_INIT_PARAM > >
+	     //fastl :: Pool< __USER_CHUNK_SIZE > >
    class singleton
    {
    public:

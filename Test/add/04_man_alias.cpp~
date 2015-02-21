@@ -1,4 +1,4 @@
-#include "../../Array/ADscalar.hpp"
+#include "../ADscalar.hpp"
 
 // print array
 template< typename A >
@@ -57,10 +57,19 @@ int main()
 
 
    std::size_t REPEAT = 2000000;
-   for( std::size_t iter = 0; iter < REPEAT; ++iter )
+   for( std::size_t j = 0; j < REPEAT; ++j )
    {
+      /* Manual array operation */
+      for( std::size_t i = 0; i < C.size(); ++i )
+      {
+      	 Z[i] = A[i] + B[i] + C[i] + D[i] ;
+      }
+
       /* ADscalar with expression template */
-      z = a + b + c + d;
+      // z = a + b + c + d + e + 
+      // 	 f + g + h + i + j + 
+      // 	 k + l + m + n + o + 
+      // 	 p + q + r + s + t ;
    }
 
    std::cout << Z[0] << "\t" << Z[999] << std::endl;
