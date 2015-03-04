@@ -57,9 +57,9 @@ namespace fastl { // ------------------------------------------ BEGIN NAMESPACE
     *  Runtime fixed-size heap array container
     **/
    // ----------------------------------------------------------------------- //
-   template< typename __Alloc = fastl::malloc_alloc<> >
-	     //fastl::singleton< 100, 100, 1000*sizeof(double) > >
-   class array : public __Alloc
+   template< typename __Alloc = fastl::singleton<6> >
+   //fastl::malloc_alloc<> >
+   class array
    {
     
    protected:

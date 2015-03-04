@@ -166,9 +166,9 @@ namespace fastl
 	 std::cout << "chunk_size = " << chunk_size << std::endl;
 	 std::cout << "num_chunks = " << _num_chunk << std::endl;
 	 std::cout << "MemBlock_size = " << mb_sz << std::endl;
-	 std::cout << "MemBlock:   " << p_mb_head << " --- --- > " << p_mb_head + mb_sz << std::endl;
+	 std::cout << "MemBlock:   " << p_mb_head << " --- --- > " << (void*)((char*)p_mb_head + mb_sz) << std::endl;
 	 std::cout << "Buffer:     " << p_available << " --- --- > "
-		   << p_available + _num_chunk * chunk_size << std::endl;
+		   << (void*)((char*)p_available + _num_chunk * chunk_size) << std::endl;
 	 std::cout << "------------------------------------------" << std::endl;
 #endif
       }
@@ -190,7 +190,6 @@ namespace fastl
 	 void* p_run = p_available;
 	 for( std::size_t i = 1; i < num_chunk; ++i )
 	 {
-	    void* test = static_cast<void*>( static_cast<char*>( p_run ) + chunk_size );
 	    nextof( p_run ) = static_cast<void*>( static_cast<char*>( p_run ) + chunk_size );
 	    p_run = nextof( p_run );
 	 }
