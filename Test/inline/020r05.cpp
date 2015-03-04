@@ -13,7 +13,7 @@ int main()
    e.make_independent(4);
 
 
-   std::size_t REPEAT = 1E+06;
+   std::size_t REPEAT = 5E+05;
    for( std::size_t iter = 0; iter < REPEAT; ++iter )
    {
       /* ADscalar with expression template */

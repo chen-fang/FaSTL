@@ -17,10 +17,10 @@ public:
    // {}
 
    inline
-   value_type operator [] ( std::size_t i )         {  return m_gradient[i];  }
+   value_type __attribute__ ((always_inline)) operator [] ( std::size_t i )         {  return m_gradient[i];  }
 
    inline
-   value_type operator [] ( std::size_t i ) const   {  return m_gradient[i];  }
+   value_type __attribute__ ((always_inline)) operator [] ( std::size_t i ) const   {  return m_gradient[i];  }
 
    inline
    std::size_t size () const

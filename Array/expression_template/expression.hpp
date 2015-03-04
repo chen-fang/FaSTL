@@ -161,8 +161,8 @@ public:
    V_p_W ( const Left& _v, const Right& _w ) : V(_v), W(_w)
    {}
 
-   inline value_type operator [] ( std::size_t i )            { return V[i] + W[i]; }
-   inline value_type operator [] ( std::size_t i ) const      { return V[i] + W[i]; }
+   inline value_type __attribute__ ((always_inline)) operator [] ( std::size_t i )            { return V[i] + W[i]; }
+   inline value_type __attribute__ ((always_inline)) operator [] ( std::size_t i ) const      { return V[i] + W[i]; }
    inline std::size_t size () const                           { return V.size();  }
 
 private:
@@ -192,8 +192,8 @@ public:
    }
 
 
-   inline value_type operator [] ( std::size_t i )            { return V[i] - W[i]; }
-   inline value_type operator [] ( std::size_t i ) const      { return V[i] - W[i]; }
+   inline value_type __attribute__ ((always_inline)) operator [] ( std::size_t i )            { return V[i] - W[i]; }
+   inline value_type __attribute__ ((always_inline)) operator [] ( std::size_t i ) const      { return V[i] - W[i]; }
    inline std::size_t size () const                           { return V.size();  }
 
 private:
