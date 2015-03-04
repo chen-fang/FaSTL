@@ -1,15 +1,12 @@
-GCC=g++
-GFLAGS=-Wall -g -std=c++11 -O3
-FLAGS=-D ET_TEST
-DUMP=-D DUMP_FREELIST
+CXX = g++
+CXXFLAGS = -Wall -g -std=c++11 -O3 -D ET_TEST -D DUMP_FREELIST
+#FLAGS=-D ET_TEST
+#DUMP=-D DUMP_FREELIST
 
-SRC=./*.cpp
+PROGRAMS = 020r05 040r05 060r05 080r05 100r05 120r05 140r05 160r05 
 
-OUT= *.out
-
-
-g:
-	$(GCC) $(GFLAGS) $(FLAGS) $(DUMP) $(SRC) -o $(OUT)
+all: $(PROGRAMS)
 
 clean:
-	rm -rf $(OUT) ./*~ ./*.o
+	rm -f *.o $(PROGRAMS) *~
+

@@ -20,7 +20,22 @@ int main()
       z =a + b + c + d + e + 
 	 a + b + c + d + e + 
 	 a + b + c + d + e + 
-	 a + b + c + d + e ;
+	 a + b + c + d + e + /*20*/
+
+	 a + b + c + d + e + 
+	 a + b + c + d + e + 
+	 a + b + c + d + e + 
+	 a + b + c + d + e + /*40*/
+
+      	 a + b + c + d + e + 
+	 a + b + c + d + e + 
+	 a + b + c + d + e + 
+	 a + b + c + d + e + /*60*/
+
+	 a + b + c + d + e + 
+	 a + b + c + d + e + 
+	 a + b + c + d + e + 
+	 a + b + c + d + e ; /*80*/
 
    }
 
