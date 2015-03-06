@@ -1,0 +1,9 @@
+-r
+/home/blackicefc/Documents/GitHub/FaSTL/Test/num_operands_and_vector_size/OpSz_sum04/r010ah
+--itt-config=frame
+--data-limit-mb=500
+--event-config=CPU_CLK_UNHALTED.THREAD:sa=1600000,CPU_CLK_UNHALTED.REF_TSC:sa=1600000,INST_RETIRED.ANY:sa=1600000
+--event-mux
+--collector=perf
+--
+/home/blackicefc/Documents/GitHub/FaSTL/Test/num_operands_and_vector_size/sum04_ad

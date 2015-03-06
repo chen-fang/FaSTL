@@ -85,7 +85,7 @@ namespace fastl { // ------------------------------------------ BEGIN NAMESPACE
 
       // default value is provided for test purpose.
       // should delete when done.
-      explicit array ( size_type _size = 8 );
+      explicit array ( size_type _size = 1 );
       array ( size_type _size, const_reference _elem );
       array ( const this_type & _clone );
       array ( array && _other );

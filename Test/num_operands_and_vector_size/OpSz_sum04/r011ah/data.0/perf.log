@@ -1,0 +1,2 @@
+[ perf record: Woken up 1 times to write data ]
+[ perf record: Captured and wrote 0.016 MB /home/blackicefc/Documents/GitHub/FaSTL/Test/num_operands_and_vector_size/OpSz_sum04/r011ah/data.0/temp.sync.perf (~682 samples) ]

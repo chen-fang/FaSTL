@@ -1,0 +1,55 @@
+VTune Linux Perf Time Sync: 1
+VTune Start TSC 1455640017913:1455640154153:1455640278381:1455640401777:1455640525105:1455640649949:1455640773449:1455640896741
+# ========
+# captured on: Fri Mar  6 14:29:52 2015
+# hostname : localhost.localdomain
+# os release : 3.18.6-100.fc20.x86_64
+# perf version : 3.13.0
+# arch : x86_64
+# nrcpus online : 4
+# nrcpus avail : 4
+# cpudesc : Intel(R) Core(TM) i5-4200U CPU @ 1.60GHz
+# cpuid : GenuineIntel,6,69,1
+# total memory : 8069952 kB
+# cmdline : /opt/intel/vtune_amplifier_xe_2015.1.0.367959/bin64/amplxe-perf record -o /home/blackicefc/Documents/GitHub/FaSTL/Test/num_operands_and_vector_size/OpSz_sum04/r010ah/data.0/temp.sync.perf -e context-switches -c 1 /opt/intel/vtune_amplifier_xe_2015.1.0.367959/bin64/amplxe-perf-sync /home/blackicefc/Documents/GitHub/FaSTL/Test/num_operands_and_vector_size/OpSz_sum04/r010ah/data.0/13878.perf.sync tsc start 
+# event : name = context-switches, type = 1, config = 0x3, config1 = 0x0, config2 = 0x0, excl_usr = 0, excl_kern = 0, excl_host = 0, excl_guest = 1, precise_ip = 0, attr_mmap2 = 0, attr_mmap  = 1, attr_mmap_data = 0
+# HEADER_CPU_TOPOLOGY info available, use -I to display
+# HEADER_NUMA_TOPOLOGY info available, use -I to display
+# pmu mappings: cpu = 4, software = 1, tracepoint = 2, breakpoint = 5
+# ========
+#
+ amplxe-perf-syn 13889  8890.069161: context-switches:  ffffffff817485f4 __sched_text_start ([kernel.kallsyms])
+ amplxe-perf-syn 13889  8890.069217: context-switches:  ffffffff817485f4 __sched_text_start ([kernel.kallsyms])
+ amplxe-perf-syn 13889  8890.069271: context-switches:  ffffffff817485f4 __sched_text_start ([kernel.kallsyms])
+ amplxe-perf-syn 13889  8890.069324: context-switches:  ffffffff817485f4 __sched_text_start ([kernel.kallsyms])
+ amplxe-perf-syn 13889  8890.069378: context-switches:  ffffffff817485f4 __sched_text_start ([kernel.kallsyms])
+ amplxe-perf-syn 13889  8890.069432: context-switches:  ffffffff817485f4 __sched_text_start ([kernel.kallsyms])
+ amplxe-perf-syn 13889  8890.069486: context-switches:  ffffffff817485f4 __sched_text_start ([kernel.kallsyms])
+ amplxe-perf-syn 13889  8890.069540: context-switches:  ffffffff817485f4 __sched_text_start ([kernel.kallsyms])
+VTune End TSC 1462877341548:1462877475283:1462877598701:1462877721165:1462877843767:1462877966271:1462878090408:1462878213080
+# ========
+# captured on: Fri Mar  6 14:29:55 2015
+# hostname : localhost.localdomain
+# os release : 3.18.6-100.fc20.x86_64
+# perf version : 3.13.0
+# arch : x86_64
+# nrcpus online : 4
+# nrcpus avail : 4
+# cpudesc : Intel(R) Core(TM) i5-4200U CPU @ 1.60GHz
+# cpuid : GenuineIntel,6,69,1
+# total memory : 8069952 kB
+# cmdline : /opt/intel/vtune_amplifier_xe_2015.1.0.367959/bin64/amplxe-perf record -o /home/blackicefc/Documents/GitHub/FaSTL/Test/num_operands_and_vector_size/OpSz_sum04/r010ah/data.0/temp.sync.perf -e context-switches -c 1 /opt/intel/vtune_amplifier_xe_2015.1.0.367959/bin64/amplxe-perf-sync /home/blackicefc/Documents/GitHub/FaSTL/Test/num_operands_and_vector_size/OpSz_sum04/r010ah/data.0/13878.perf.sync tsc end 
+# event : name = context-switches, type = 1, config = 0x3, config1 = 0x0, config2 = 0x0, excl_usr = 0, excl_kern = 0, excl_host = 0, excl_guest = 1, precise_ip = 0, attr_mmap2 = 0, attr_mmap  = 1, attr_mmap_data = 0
+# HEADER_CPU_TOPOLOGY info available, use -I to display
+# HEADER_NUMA_TOPOLOGY info available, use -I to display
+# pmu mappings: cpu = 4, software = 1, tracepoint = 2, breakpoint = 5
+# ========
+#
+ amplxe-perf-syn 13896  8893.221355: context-switches:  ffffffff817485f4 __sched_text_start ([kernel.kallsyms])
+ amplxe-perf-syn 13896  8893.221410: context-switches:  ffffffff817485f4 __sched_text_start ([kernel.kallsyms])
+ amplxe-perf-syn 13896  8893.221463: context-switches:  ffffffff817485f4 __sched_text_start ([kernel.kallsyms])
+ amplxe-perf-syn 13896  8893.221516: context-switches:  ffffffff817485f4 __sched_text_start ([kernel.kallsyms])
+ amplxe-perf-syn 13896  8893.221570: context-switches:  ffffffff817485f4 __sched_text_start ([kernel.kallsyms])
+ amplxe-perf-syn 13896  8893.221623: context-switches:  ffffffff817485f4 __sched_text_start ([kernel.kallsyms])
+ amplxe-perf-syn 13896  8893.221677: context-switches:  ffffffff817485f4 __sched_text_start ([kernel.kallsyms])
+ amplxe-perf-syn 13896  8893.221730: context-switches:  ffffffff817485f4 __sched_text_start ([kernel.kallsyms])

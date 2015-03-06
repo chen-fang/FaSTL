@@ -1,0 +1,24 @@
+PMU type: Core
+Group 0:
+INST_RETIRED.ANY: event id 2
+CPU_CLK_UNHALTED.THREAD: event id 0
+CPU_CLK_UNHALTED.REF_TSC: event id 1
+
+CCCR
+reg_type       = 1	event_id       = g	reg_id         = 38f	reg_value      = 700000000
+reg_type       = 1	event_id       = g	reg_id         = 390	reg_value      = 70000000f
+reg_type       = 1	event_id       = g	reg_id         = 3f1	reg_value      = 0
+reg_type       = 1	event_id       = g	reg_id         = 1d9	reg_value      = 1800
+reg_type       = 1	event_id       = g	reg_id         = 38d	reg_value      = bbb
+reg_type       = 1	event_id       = 0	reg_id         = 186	reg_value      = 0
+reg_type       = 1	event_id       = 0	reg_id         = 187	reg_value      = 0
+reg_type       = 1	event_id       = 0	reg_id         = 188	reg_value      = 0
+reg_type       = 1	event_id       = 0	reg_id         = 189	reg_value      = 0
+
+ESCR
+
+DATA
+reg_type       = 4	event_id       = 2	reg_id         = 309	reg_value      = ffffffe79600
+reg_type       = 4	event_id       = 0	reg_id         = 30a	reg_value      = ffffffe79600
+reg_type       = 4	event_id       = 1	reg_id         = 30b	reg_value      = ffffffe79600
+
