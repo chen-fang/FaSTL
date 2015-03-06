@@ -45,10 +45,12 @@
 namespace fastl { // ----------------------------------------- BEGIN NAMESPACE 
 
    //.............................  LIFECYCLE  ..........................//
-   template< typename __A >
-   array<__A> :: array ( ) :
-      N(0), p_beg(nullptr)
-   {  /* void */  }
+   // Below is commneted out for test purpose.
+   // Should restore when done.
+   // template< typename __A >
+   // array<__A> :: array ( ) :
+   //    N(0), p_beg(nullptr)
+   // {  /* void */  }
 
    template< typename __A > 
    array<__A> :: array ( array<__A>::size_type _size ) :

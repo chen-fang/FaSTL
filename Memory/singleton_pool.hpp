@@ -21,9 +21,9 @@
 
 namespace fastl
 {
-   template< std::size_t __USER_INIT_PARAM,
+   template< std::size_t __USER_INIT_PARAM = 10,
 	     std::size_t __USER_GROW_PARAM = __USER_INIT_PARAM,
-	     std::size_t __USER_CHUNK_SIZE = 500*sizeof(double),
+	     std::size_t __USER_CHUNK_SIZE = 10*sizeof(double),
 	     typename __ALLOC = fastl::freelist_pool< __USER_CHUNK_SIZE > >
 	     //fastl :: Pool< __USER_CHUNK_SIZE > >
    class singleton

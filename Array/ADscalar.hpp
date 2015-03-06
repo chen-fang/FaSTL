@@ -10,10 +10,10 @@ public:
    typedef double                            value_type;
    typedef fastl::array<>                    gradient_type;
 
-   ADscalar() : m_value(0), m_gradient(500)
+   ADscalar() : m_value(0), m_gradient(4)
    {}
 
-   ADscalar( value_type _value ) : m_value(_value), m_gradient(500)
+   ADscalar( value_type _value ) : m_value(_value), m_gradient(4)
    {}
 
    ADscalar( const ADscalar & _clone ) : m_value(_clone.m_value),

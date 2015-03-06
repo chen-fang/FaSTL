@@ -57,7 +57,7 @@ namespace fastl { // ------------------------------------------ BEGIN NAMESPACE
     *  Runtime fixed-size heap array container
     **/
    // ----------------------------------------------------------------------- //
-   template< typename __Alloc = fastl::singleton<6> >
+   template< typename __Alloc = fastl::singleton<> >
    //fastl::malloc_alloc<> >
    class array
    {
@@ -78,9 +78,14 @@ namespace fastl { // ------------------------------------------ BEGIN NAMESPACE
     
    public:
       //.............................  LIFECYCLE  ..........................//
+      
+      // Below is commneted out for test purpose.
+      // Should restore when done.
+      //explicit array ();    
 
-      explicit array ();    
-      explicit array ( size_type _size );
+      // default value is provided for test purpose.
+      // should delete when done.
+      explicit array ( size_type _size = 8 );
       array ( size_type _size, const_reference _elem );
       array ( const this_type & _clone );
       array ( array && _other );
