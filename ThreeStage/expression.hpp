@@ -1,18 +1,7 @@
 #pragma once
 
 #include "Op.hpp"
-
-template< typename T >
-struct VRtraits
-{
-   typedef T                        type;
-};
-
-template<>
-struct VRtraits< ADunivariate >
-{
-   typedef const_reference_type     type;
-};
+#include "ADtraits.hpp"
 
 // ==============================================================
 /* Template Parameter <T>
@@ -57,7 +46,7 @@ class Leaf
 public:
    typedef typename T::value_type          value_type;
 
-   Leaf ( const T& leaf ) : m_leaf( leaf ) {}
+   Leaf ( const T& _leaf ) : m_leaf( _leaf ) {}
 
    inline value_type operator [] ( std::size_t index )
    {
@@ -83,16 +72,21 @@ template< typename T1, typename T2, typename Op >
 class Xpr
 {
 public:
-   typedef TRtraits< T1 >                                                  LeftType;
-   typedef TRtraits< T2 >                                                  RightType;
+   typedef typename VRtraits< T1 >::type                                   LeftType;
+   typedef typename VRtraits< T2 >::type                                   RightType;
    typedef typename T1::value_type                                         LeftValueType;
    typedef typename T2::value_type                                         RightValueType;
-   typedef ValueType_Traits< LeftValueType, RightValueType >::value_type   value_type;
+   typedef typename T1::size_type                                          size_type;
+   typedef typename ValueType_Traits< LeftValueType, RightValueType >::value_type   value_type;
 
-   Xpr ( const T1& _left, const T2& _right )
-      : m_left( _left ), m_right( _right )
+   Xpr ( const T1& _left, const T2& _right ) : m_left( _left ), m_right( _right )
    {}
 
+   inline size_type  index () const      { return m_left.index();                               }
+   inline size_type  block_index() const { return m_left.block_index();                         }
+   inline size_type  location () const   { return m_left.location();                            }
+   inline value_type value () const      { return Op::value( m_left.value(), m_right.value() ); }
+   inline value_type derivative () const { return Op::Get_Derivative( m_left, m_right );        }
 
    // inline value_type operator [] ( std::size_t index )
    // {
@@ -104,10 +98,10 @@ public:
    //    return Op::apply( m_left[index], m_right[index] );
    // }
 
-   inline std::size_t size () const
-   {
-      return m_left.size();
-   }
+   // inline std::size_t size () const
+   // {
+   //    return m_left.size();
+   // }
 
 private:
    LeftType       m_left;

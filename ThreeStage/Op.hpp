@@ -3,12 +3,19 @@
 struct OpAdd
 {
    template< typename T >
-   inline static T apply ( const T& a, const T& b )
+   inline static T value ( T a, T b )
    {
-      return a + b;
+      return ( a + b );
+   }
+
+   template< typename T1, typename T2 >
+   inline static typename T1::size_type Get_Derivative ( const T1& t1, const T2& t2 )
+   {
+      return ( t1.derivative() + t2.derivative() );
    }
 };
 
+/*
 struct OpSub
 {
    template< typename T >
@@ -35,3 +42,4 @@ struct OpDiv
       return a / b;
    }
 };
+*/

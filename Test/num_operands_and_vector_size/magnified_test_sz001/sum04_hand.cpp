@@ -13,8 +13,17 @@ int main()
       for( std::size_t i = 0; i < a1.size(); ++i )
       {
       	 z[i] = a1[i] + a2[i] + a3[i] + a4[i];
+      }
+      for( std::size_t i = 0; i < a1.size(); ++i )
+      {
       	 z[i] = a1[i] + a2[i] + a3[i] + a4[i];
+      }
+      for( std::size_t i = 0; i < a1.size(); ++i )
+      {
       	 z[i] = a1[i] + a2[i] + a3[i] + a4[i];
+      }
+      for( std::size_t i = 0; i < a1.size(); ++i )
+      {
       	 z[i] = a1[i] + a2[i] + a3[i] + a4[i];
       }
    }

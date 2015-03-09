@@ -9,11 +9,10 @@ int main()
    std::size_t REPEAT = 5E+09;
    for( std::size_t iter = 0; iter < REPEAT; ++iter )
    {
-      /* ADscalar with expression template */
-      z += (a1 + a2);
-      z += (a1 + a2);
-      z += (a1 + a2);
-      z += (a1 + a2);
+      z = a1 + a2;
+      z = a1 + a2;
+      z = a1 + a2;
+      z = a1 + a2;
    }
 
    std::cout << z << std::endl;
